@@ -17,6 +17,8 @@ import Role from "./views/auth/Role";
 import Menus from "./views/auth/Menus";
 import NotPermission from './views/403.vue'
 import Config from "./views/sys/Config";
+import Dictionary from "./views/sys/Dictionary";
+import DictionaryItem from "./views/sys/DictionaryItem";
 
 
 let routes = [
@@ -80,9 +82,9 @@ let routes = [
         name: '系统管理',
         iconCls: 'el-icon-message',
         children: [
-            { path: '/config', component: Config, name: '系统管理' },
-            { path: '/dictionary', component: Role, name: '数据字典' },
-            { path: '/dictionaryitem', component: Menus, name: '数据字典明细' }
+            { path: '/config', component: Config, name: '系统配置' },
+            { path: '/dictionary', component: Dictionary, name: '数据字典' },
+            { path: '/dictionaryitem', component: DictionaryItem, name: '数据字典明细' }
         ]
     },
     //{ path: '/main', component: Main },

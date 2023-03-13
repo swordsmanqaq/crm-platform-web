@@ -22,13 +22,15 @@
       </el-table-column>
       <el-table-column type="index" width="100">
       </el-table-column>
-      <el-table-column prop="key" label="Key-值" width="200" sortable>
+      <el-table-column prop="title" label="名称" width="130" sortable>
       </el-table-column>
-      <el-table-column prop="value" label="Value-值" width="200" sortable>
+      <el-table-column prop="value" label="Value-值" width="150" sortable>
       </el-table-column>
-      <el-table-column prop="type" label="类型" width="200" sortable>
+      <el-table-column prop="sequence" label="排序" width="150" sortable>
       </el-table-column>
-      <el-table-column prop="intro" label="介绍" width="260" sortable>
+      <el-table-column prop="parentId" label="所属数据字典" width="200" sortable>
+      </el-table-column>
+      <el-table-column prop="intro" label="介绍" width="240" sortable>
       </el-table-column>
       <el-table-column label="操作" width="200">
         <template scope="scope">
@@ -55,14 +57,17 @@
     <!--新增/修改 编辑界面-->
     <el-dialog title="新增/修改" :visible.sync="saveFormVisible" :close-on-click-modal="false">
       <el-form :model="saveForm" label-width="80px" :rules="saveFormRules" ref="addForm">
-        <el-form-item label="Key-值" prop="key">
-          <el-input v-model="saveForm.key" auto-complete="off"></el-input>
+        <el-form-item label="名称">
+          <el-input v-model="saveForm.title" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="Value-值">
           <el-input type="text" v-model="saveForm.value" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="类型">
-          <el-input type="text" v-model="saveForm.type" auto-complete="off"></el-input>
+        <el-form-item label="排序">
+          <el-input type="text" v-model="saveForm.sequence" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="所属数据字典">
+          <el-input type="text" v-model="saveForm.parentId" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="介绍">
           <el-input type="text" v-model="saveForm.intro" auto-complete="off"></el-input>
@@ -108,9 +113,10 @@ export default {
       //编辑界面数据
       saveForm: {
         id: null,
-        key: '',
+        title: '',
         value: '',
-        type: null,
+        sequence: null,
+        parentId: null,
         intro: ''
       },
 
@@ -121,18 +127,18 @@ export default {
 
     search() {
       this.query.currentPage = 1;
-      this.getConfigs();
+      this.getDictionaryItems();
     },
 
     handleSizeChange(val) {
       this.query.pageSize = val;
       this.query.currentPage = 1;
-      this.getConfigs();
+      this.getDictionaryItems();
     },
 
     handleCurrentChange(val) {
       this.query.currentPage = val;
-      this.getConfigs();
+      this.getDictionaryItems();
     },
 
     selsChange: function (sels) {
@@ -140,8 +146,8 @@ export default {
     },
 
     //获取角色列表
-    getConfigs() {
-      this.$http.post("/config", this.query)
+    getDictionaryItems() {
+      this.$http.post("/dictionaryitem", this.query)
           .then(result => {
             result = result.data;
             if (result.success) {
@@ -161,14 +167,14 @@ export default {
         type: 'warning'
       }).then(() => {
         this.listLoading = true;
-        this.$http.delete("/config/" + row.id)
+        this.$http.delete("/dictionaryitem/" + row.id)
             .then(result => {
               result = result.data;
               this.listLoading = false;
               if (result.success) {
                 this.$message({message: '删除成功', type: 'success'});
                 this.query.currentPage = 1;
-                this.getConfigs();
+                this.getDictionaryItems();
               } else {
                 this.$message({message: result.message, type: 'error'});
               }
@@ -190,14 +196,14 @@ export default {
       }).then(() => {
         this.listLoading = true;
         // 调用批量删除接口
-        this.$http.patch("/config", ids)
+        this.$http.patch("/dictionaryitem", ids)
             .then(result => {
               result = result.data;
               this.listLoading = false;
               if (result.success) {
                 this.$message({message: '批量删除成功!', type: 'success'});
                 this.query.currentPage = 1;
-                this.getConfigs();
+                this.getDictionaryItems();
               } else {
                 this.$message({message: result.message, type: 'error'});
               }
@@ -218,9 +224,10 @@ export default {
       this.saveFormVisible = true;
       this.saveForm = {
         id: null,
-        key: '',
+        title: '',
         value: '',
-        type: null,
+        sequence: null,
+        parentId: null,
         intro: ''
       };
     },
@@ -232,12 +239,12 @@ export default {
           this.$confirm('确认提交吗？', '提示', {}).then(() => {
             this.addLoading = true;
 
-            this.$http.put("/config", this.saveForm)
+            this.$http.put("/dictionaryitem", this.saveForm)
                 .then(result => {
                   result = result.data;
                   if (result.success) {
                     this.query.currentPage = 1;
-                    this.getConfigs();
+                    this.getDictionaryItems();
                     this.addLoading = false;
                     this.saveFormVisible = false;
                     this.$message({message: '保存成功', type: 'success'});
@@ -254,7 +261,7 @@ export default {
 
   mounted() {
     // 钩子函数，页面加载后，调用此方法
-    this.getConfigs();
+    this.getDictionaryItems();
   }
 }
 

@@ -28,9 +28,9 @@
       </el-table-column>
       <el-table-column prop="sequence" label="排序" width="150" sortable>
       </el-table-column>
-      <el-table-column prop="parentId" label="所属数据字典" width="200" sortable>
-      </el-table-column>
       <el-table-column prop="intro" label="介绍" width="240" sortable>
+      </el-table-column>
+      <el-table-column prop="parent.title" label="数据字典" width="200" sortable>
       </el-table-column>
       <el-table-column label="操作" width="200">
         <template scope="scope">
@@ -66,11 +66,20 @@
         <el-form-item label="排序">
           <el-input type="text" v-model="saveForm.sequence" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="所属数据字典">
-          <el-input type="text" v-model="saveForm.parentId" auto-complete="off"></el-input>
-        </el-form-item>
         <el-form-item label="介绍">
           <el-input type="text" v-model="saveForm.intro" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="数据字典">
+          <el-select v-model="saveForm.parent" clearable value-key="id" placeholder="请选择数据字典">
+            <el-option
+                v-for="item in dictionarys"
+                :key="item.id"
+                :label="item.title"
+                :value="item">
+              <span style="float: left">{{ item.sn }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">{{ item.intro }}</span>
+            </el-option>
+          </el-select>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -116,9 +125,14 @@ export default {
         title: '',
         value: '',
         sequence: null,
-        parentId: null,
+        parent: {
+          id: null,
+          title: ''
+        },
         intro: ''
       },
+
+      dictionarys:[]
 
     }
   },
@@ -145,11 +159,12 @@ export default {
       this.sels = sels;
     },
 
-    //获取角色列表
+    //获取数据字典明细列表
     getDictionaryItems() {
       this.$http.post("/dictionaryitem", this.query)
           .then(result => {
             result = result.data;
+            console.log(result);
             if (result.success) {
               this.pageInfo = result.resultObj;
             } else {
@@ -213,21 +228,41 @@ export default {
       });
     },
 
+    //获取数据字典
+    getDictionarys(){
+      this.$http.get("/dictionary")
+          .then(result => {
+            result = result.data;
+            if (result.success){
+              this.dictionarys = result.resultObj;
+            }else {
+              this.$message({message: '查询失败' + result.message, type: 'error'});
+            }
+          }).catch( request => {
+            this.$message({message: result.message, type: 'error'});
+      })
+    },
+
     //显示修改界面
     handleEdit: function (index, row) {
       this.saveFormVisible = true;
+      this.getDictionarys();
       this.saveForm = Object.assign({}, row);
     },
 
     //显示新增界面
     handleAdd: function () {
       this.saveFormVisible = true;
+      this.getDictionarys();
       this.saveForm = {
         id: null,
         title: '',
         value: '',
         sequence: null,
-        parentId: null,
+        parent: {
+          id: null,
+          title: ''
+        },
         intro: ''
       };
     },

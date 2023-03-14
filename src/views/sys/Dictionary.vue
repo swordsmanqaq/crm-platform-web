@@ -34,7 +34,6 @@
         <template scope="scope">
           <el-button size="small" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
           <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">Delete</el-button>
-          <el-button type="success" size="small" @click="handleItem(scope.$index, scope.row)">Set-Item</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -137,8 +136,6 @@ export default {
         intro: ''
       },
 
-      //设置数据字典Item的data
-      itemFormVisible: false
 
     }
   },
@@ -276,10 +273,6 @@ export default {
       });
     },
 
-    //设置数据字典Item
-    handleItem(){
-      this.itemFormVisible = true;
-    }
 
   },
 

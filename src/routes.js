@@ -20,6 +20,12 @@ import Config from "./views/sys/Config";
 import Dictionary from "./views/sys/Dictionary";
 import DictionaryItem from "./views/sys/DictionaryItem";
 
+import ProductType from "./views/prod/ProductType";
+import Product from "./views/prod/Product";
+
+import Activity from "./views/mkt/Activity";
+import ActivityRemark from "./views/mkt/ActivityRemark";
+import Business from "./views/mkt/Business";
 
 let routes = [
     {
@@ -87,6 +93,28 @@ let routes = [
             { path: '/dictionaryitem', component: DictionaryItem, name: '数据字典明细' }
         ]
     },
+    {
+        path: '/',
+        component: Home,
+        name: '产品模块',
+        iconCls: 'el-icon-message',
+        children: [
+            { path: '/product', component: Product, name: '产品' },
+            { path: '/productType', component: ProductType, name: '产品类型' }
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '营销模块',
+        iconCls: 'el-icon-message',
+        children: [
+            { path: '/activity', component: Activity, name: '活动' },
+            { path: '/activityRemark', component: ActivityRemark, name: '活动记录' },
+            { path: '/business', component: Business, name: '商机' }
+        ]
+    },
+
     //{ path: '/main', component: Main },
     {
         path: '/',

@@ -20,17 +20,25 @@
               style="width: 100%;">
       <el-table-column type="selection" width="55">
       </el-table-column>
-      <el-table-column type="index" width="100">
+      <el-table-column type="index" width="60">
       </el-table-column>
-      <el-table-column prop="title" label="名称" width="130" sortable>
+      <el-table-column prop="name" label="商机名称" width="210" sortable>
       </el-table-column>
-      <el-table-column prop="value" label="Value-值" width="150" sortable>
+      <el-table-column prop="clueId" label="线索" width="120" sortable>
       </el-table-column>
-      <el-table-column prop="sequence" label="排序" width="150" sortable>
+      <el-table-column prop="productId" label="产品id" width="120" sortable>
       </el-table-column>
-      <el-table-column prop="intro" label="介绍" width="240" sortable>
+      <el-table-column prop="productName" label="产品名称" width="180" sortable>
       </el-table-column>
-      <el-table-column prop="parent.title" label="数据字典" width="200" sortable>
+      <el-table-column prop="productPrice" label="产品价格" width="150" sortable>
+      </el-table-column>
+      <el-table-column prop="state" label="状态" width="120" sortable>
+        <template slot-scope="scope">
+          <span v-if="scope.row.state === 0">跟进中</span>
+          <span v-if="scope.row.state === 1">缴纳定金</span>
+          <span v-if="scope.row.state === 2">成单</span>
+          <span v-if="scope.row.state === -1">商机池</span>
+        </template>
       </el-table-column>
       <el-table-column label="操作" width="200">
         <template scope="scope">
@@ -57,29 +65,28 @@
     <!--新增/修改 编辑界面-->
     <el-dialog title="新增/修改" :visible.sync="saveFormVisible" :close-on-click-modal="false">
       <el-form :model="saveForm" label-width="80px" :rules="saveFormRules" ref="addForm">
-        <el-form-item label="名称">
-          <el-input v-model="saveForm.title" auto-complete="off"></el-input>
+        <el-form-item label="商机名称">
+          <el-input v-model="saveForm.name" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="Value-值">
-          <el-input type="text" v-model="saveForm.value" auto-complete="off"></el-input>
+        <el-form-item label="线索">
+          <el-input type="text" v-model="saveForm.clueId" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="排序">
-          <el-input type="text" v-model="saveForm.sequence" auto-complete="off"></el-input>
+        <el-form-item label="产品Id">
+          <el-input type="number" v-model="saveForm.productId" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="介绍">
-          <el-input type="text" v-model="saveForm.intro" auto-complete="off"></el-input>
+        <el-form-item label="产品名称">
+          <el-input type="number" v-model="saveForm.productName" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="数据字典">
-          <el-select v-model="saveForm.parent" clearable value-key="id" placeholder="请选择数据字典">
-            <el-option
-                v-for="item in dictionarys"
-                :key="item.id"
-                :label="item.title"
-                :value="item">
-              <span style="float: left">{{ item.sn }}</span>
-              <span style="float: right; color: #8492a6; font-size: 13px">{{ item.intro }}</span>
-            </el-option>
-          </el-select>
+        <el-form-item label="产品价格">
+          <el-input type="number" v-model="saveForm.productPrice" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="状态">
+          <template>
+            <el-radio v-model="saveForm.state" label="1">跟进中</el-radio>
+            <el-radio v-model="saveForm.state" label="2">缴纳定金</el-radio>
+            <el-radio v-model="saveForm.state" label="3">成单</el-radio>
+            <el-radio v-model="saveForm.state" label="-1">商机池</el-radio>
+          </template>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -122,17 +129,13 @@ export default {
       //编辑界面数据
       saveForm: {
         id: null,
-        title: '',
-        value: '',
-        sequence: null,
-        parent: {
-          id: null,
-          title: ''
-        },
-        intro: ''
+        name: '',
+        clueId: null,
+        productId: null,
+        productName: '',
+        productPrice: null,
+        state: null
       },
-
-      dictionarys:[]
 
     }
   },
@@ -141,27 +144,27 @@ export default {
 
     search() {
       this.query.currentPage = 1;
-      this.getDictionaryItems();
+      this.getBusiness();
     },
 
     handleSizeChange(val) {
       this.query.pageSize = val;
       this.query.currentPage = 1;
-      this.getDictionaryItems();
+      this.getBusiness();
     },
 
     handleCurrentChange(val) {
       this.query.currentPage = val;
-      this.getDictionaryItems();
+      this.getBusiness();
     },
 
     selsChange: function (sels) {
       this.sels = sels;
     },
 
-    //获取数据字典明细列表
-    getDictionaryItems() {
-      this.$http.post("/dictionaryitem", this.query)
+    //获取角色列表
+    getBusiness() {
+      this.$http.post("/business", this.query)
           .then(result => {
             result = result.data;
             if (result.success) {
@@ -181,14 +184,14 @@ export default {
         type: 'warning'
       }).then(() => {
         this.listLoading = true;
-        this.$http.delete("/dictionaryitem/" + row.id)
+        this.$http.delete("/business/" + row.id)
             .then(result => {
               result = result.data;
               this.listLoading = false;
               if (result.success) {
                 this.$message({message: '删除成功', type: 'success'});
                 this.query.currentPage = 1;
-                this.getDictionaryItems();
+                this.getBusiness();
               } else {
                 this.$message({message: result.message, type: 'error'});
               }
@@ -210,14 +213,14 @@ export default {
       }).then(() => {
         this.listLoading = true;
         // 调用批量删除接口
-        this.$http.patch("/dictionaryitem", ids)
+        this.$http.patch("/business", ids)
             .then(result => {
               result = result.data;
               this.listLoading = false;
               if (result.success) {
                 this.$message({message: '批量删除成功!', type: 'success'});
                 this.query.currentPage = 1;
-                this.getDictionaryItems();
+                this.getBusiness();
               } else {
                 this.$message({message: result.message, type: 'error'});
               }
@@ -227,42 +230,23 @@ export default {
       });
     },
 
-    //获取数据字典
-    getDictionarys(){
-      this.$http.get("/dictionary")
-          .then(result => {
-            result = result.data;
-            if (result.success){
-              this.dictionarys = result.resultObj;
-            }else {
-              this.$message({message: '查询失败' + result.message, type: 'error'});
-            }
-          }).catch( request => {
-            this.$message({message: result.message, type: 'error'});
-      })
-    },
-
     //显示修改界面
     handleEdit: function (index, row) {
       this.saveFormVisible = true;
-      this.getDictionarys();
       this.saveForm = Object.assign({}, row);
     },
 
     //显示新增界面
     handleAdd: function () {
       this.saveFormVisible = true;
-      this.getDictionarys();
       this.saveForm = {
         id: null,
-        title: '',
-        value: '',
-        sequence: null,
-        parent: {
-          id: null,
-          title: ''
-        },
-        intro: ''
+        name: '',
+        clueId: null,
+        productId: null,
+        productName: '',
+        productPrice: null,
+        state: null
       };
     },
 
@@ -272,12 +256,13 @@ export default {
         if (valid) {
           this.$confirm('确认提交吗？', '提示', {}).then(() => {
             this.addLoading = true;
-            this.$http.put("/dictionaryitem", this.saveForm)
+
+            this.$http.put("/business", this.saveForm)
                 .then(result => {
                   result = result.data;
                   if (result.success) {
                     this.query.currentPage = 1;
-                    this.getDictionaryItems();
+                    this.getBusiness();
                     this.addLoading = false;
                     this.saveFormVisible = false;
                     this.$message({message: '保存成功', type: 'success'});
@@ -294,7 +279,7 @@ export default {
 
   mounted() {
     // 钩子函数，页面加载后，调用此方法
-    this.getDictionaryItems();
+    this.getBusiness();
   }
 }
 

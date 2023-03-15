@@ -94,7 +94,7 @@
       </div>
     </el-dialog>
 
-    <!-- 设置权限 编辑页面 -->
+    <!-- 设置角色 编辑页面 -->
     <el-dialog title="设置角色" :visible.sync="setRoleVisible" :close-on-click-modal="false">
       <el-form :model="EmployeeRole" label-width="80px" ref="saveForm">
         <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>

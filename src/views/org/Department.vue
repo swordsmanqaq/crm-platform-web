@@ -251,7 +251,6 @@ export default {
             }else {
               this.$message({message: '查询部门树失败' + result.message, type: 'error'});
             }
-
           }).catch(result => {
             this.$message({message: '网络错误' + result.message, type: 'error'});
       })

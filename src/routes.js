@@ -26,6 +26,8 @@ import Product from "./views/prod/Product";
 import Activity from "./views/mkt/Activity";
 import ActivityRemark from "./views/mkt/ActivityRemark";
 import Business from "./views/mkt/Business";
+import Clue from "./views/mkt/Clue";
+import ClueRemark from "./views/mkt/ClueRemark";
 
 let routes = [
     {
@@ -111,7 +113,9 @@ let routes = [
         children: [
             { path: '/activity', component: Activity, name: '活动' },
             { path: '/activityRemark', component: ActivityRemark, name: '活动记录' },
-            { path: '/business', component: Business, name: '商机' }
+            { path: '/business', component: Business, name: '商机' },
+            { path: '/clue', component: Clue, name: '线索' },
+            { path: '/clueRemark', component: ClueRemark, name: '线索记录' },
         ]
     },
 

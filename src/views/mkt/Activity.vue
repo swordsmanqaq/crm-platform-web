@@ -80,7 +80,7 @@
                   v-model="saveForm.startDate"
                   format="yyyy-MM-dd HH:mm:ss"
                   value-format="yyyy-MM-dd HH:mm:ss"
-                  type="date"
+                  type="datetime"
                   placeholder="选择日期">
               </el-date-picker>
             </div>
@@ -271,7 +271,7 @@ export default {
 
     //获取数据字典明细title
     getDictionaryItems(){
-      this.$http.get("/dictionaryitem/type")
+      this.$http.get("/dictionaryitem/type/4")
           .then( result => {
             result = result.data;
             if (result.success){

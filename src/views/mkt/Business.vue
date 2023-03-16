@@ -9,9 +9,12 @@
         <el-form-item>
           <el-button type="primary" v-on:click="search">Search</el-button>
         </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleAdd">Add</el-button>
-        </el-form-item>
+<!--        <el-form-item>-->
+<!--          <el-button type="primary" @click="handleAdd">Add</el-button>-->
+<!--        </el-form-item>-->
+<!--        <el-form-item>-->
+<!--          <el-button type="primary" @click="batchAdd" :disabled="this.sels.length===0">Batch-Add</el-button>-->
+<!--        </el-form-item>-->
       </el-form>
     </el-col>
 
@@ -20,30 +23,30 @@
               style="width: 100%;">
       <el-table-column type="selection" width="55">
       </el-table-column>
-      <el-table-column type="index" width="60">
+      <el-table-column type="index" width="40">
       </el-table-column>
-      <el-table-column prop="name" label="商机名称" width="210" sortable>
+      <el-table-column prop="name" label="商机" width="210" sortable>
       </el-table-column>
-      <el-table-column prop="clueId" label="线索" width="120" sortable>
+      <el-table-column prop="clue.fullName" label="线索人" width="120" sortable>
       </el-table-column>
-      <el-table-column prop="productId" label="产品id" width="120" sortable>
-      </el-table-column>
-      <el-table-column prop="productName" label="产品名称" width="180" sortable>
+      <el-table-column prop="product.name" label="产品名称" width="120" sortable>
       </el-table-column>
       <el-table-column prop="productPrice" label="产品价格" width="150" sortable>
       </el-table-column>
       <el-table-column prop="state" label="状态" width="120" sortable>
         <template slot-scope="scope">
-          <span v-if="scope.row.state === 0">跟进中</span>
-          <span v-if="scope.row.state === 1">缴纳定金</span>
-          <span v-if="scope.row.state === 2">成单</span>
-          <span v-if="scope.row.state === -1">商机池</span>
+          <span v-if="scope.row.state === 0" style="color: blue;">跟进中</span>
+          <span v-if="scope.row.state === 1" style="color: green;">缴纳定金</span>
+          <span v-if="scope.row.state === 2" style="color: red;">成单</span>
+          <span v-if="scope.row.state === -1" style="color: black;">商机池</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="200">
+      <el-table-column label="操作" width="400">
         <template scope="scope">
           <el-button size="small" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
-          <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">Delete</el-button>
+<!--          <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">Delete</el-button>-->
+          <el-button v-if="scope.row.state == 0" type="danger" size="small" @click="handleDeposit(scope.$index, scope.row)">Deposit</el-button>
+          <el-button v-if="scope.row.state == 0" type="danger" size="small" @click="handleMakeBill(scope.$index, scope.row)">MakeBill</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -74,17 +77,14 @@
         <el-form-item label="产品Id">
           <el-input type="number" v-model="saveForm.productId" auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="产品名称">
-          <el-input type="number" v-model="saveForm.productName" auto-complete="off"></el-input>
-        </el-form-item>
         <el-form-item label="产品价格">
           <el-input type="number" v-model="saveForm.productPrice" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="状态">
           <template>
-            <el-radio v-model="saveForm.state" label="1">跟进中</el-radio>
-            <el-radio v-model="saveForm.state" label="2">缴纳定金</el-radio>
-            <el-radio v-model="saveForm.state" label="3">成单</el-radio>
+            <el-radio v-model="saveForm.state" label="0">跟进中</el-radio>
+            <el-radio v-model="saveForm.state" label="1">缴纳定金</el-radio>
+            <el-radio v-model="saveForm.state" label="2">成单</el-radio>
             <el-radio v-model="saveForm.state" label="-1">商机池</el-radio>
           </template>
         </el-form-item>
@@ -130,8 +130,14 @@ export default {
       saveForm: {
         id: null,
         name: '',
-        clueId: null,
-        productId: null,
+        clue:{
+          id:null,
+          fullName:''
+        },
+        product:{
+          id:null,
+          name:''
+        },
         productName: '',
         productPrice: null,
         state: null
@@ -227,6 +233,20 @@ export default {
             })
       }).catch(() => {
           this.$message({message: result.message, type: 'error'});
+      });
+    },
+
+    //批量添加
+    batchAdd:function (){
+      //遍历选中的sels数组的id值给ids
+      var ids = this.sels.map(item => item.id);
+      this.$confirm('确认删除选中记录吗？', '提示', {
+        type: 'warning'
+      }).then(() => {
+        this.listLoading = true;
+
+      }).catch(() => {
+        this.$message({message: result.message, type: 'error'});
       });
     },
 

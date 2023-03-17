@@ -29,6 +29,8 @@ import Business from "./views/mkt/Business";
 import Clue from "./views/mkt/Clue";
 import ClueRemark from "./views/mkt/ClueRemark";
 
+import Order from "./views/order/Order";
+
 let routes = [
     {
         path: '/login',
@@ -116,6 +118,16 @@ let routes = [
             { path: '/business', component: Business, name: '商机' },
             { path: '/clue', component: Clue, name: '线索' },
             { path: '/clueRemark', component: ClueRemark, name: '线索记录' },
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '订单模块',
+        iconCls: 'el-icon-message',
+        children: [
+            { path: '/order', component: Order, name: '订单' }
+
         ]
     },
 

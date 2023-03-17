@@ -12,6 +12,9 @@
         <el-form-item>
           <el-button type="primary" @click="handleAdd">Add</el-button>
         </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="batchAdd" :disabled="this.sels.length===0">Batch-Add</el-button>
+        </el-form-item>
       </el-form>
     </el-col>
 
@@ -52,7 +55,7 @@
           <el-button type="success" v-if="scope.row.state == 1" size="small"
                      @click="handleFollow(scope.$index, scope.row)">Follow
           </el-button>
-          <el-button type="primary" size="small" @click="handleBusiness(scope.$index, scope.row)">Business</el-button>
+          <el-button type="primary" v-if="scope.row.state == (0 || 1)" size="small" @click="handleBusiness(scope.$index, scope.row)">Business</el-button>
           <el-button type="info" size="small" @click="handleScrap(scope.$index, scope.row)">Scrap</el-button>
         </template>
       </el-table-column>
@@ -126,7 +129,7 @@
         <el-form-item label="电话">
           <el-input type="text" v-model="saveForm.phone" auto-complete="off" disabled></el-input>
         </el-form-item>
-        <el-form-item label="活动">
+        <el-form-item label="市场活动">
           <el-select v-model="clueActivity.activityId" value-key="id" multiple placeholder="请选择活动">
             <el-option
                 v-for="item in Activitys"
@@ -517,7 +520,7 @@ export default {
 
     //获取所有活动
     getActivitys() {
-      this.$http.get("/activity")
+      this.$http.get("/clue/type/2")
           .then(result => {
             result = result.data;
             if (result.success) {

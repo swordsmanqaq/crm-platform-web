@@ -44,7 +44,6 @@
       <el-table-column label="操作" width="400">
         <template scope="scope">
           <el-button size="small" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
-<!--          <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">Delete</el-button>-->
           <el-button v-if="scope.row.state == 0" type="danger" size="small" @click="handleDeposit(scope.$index, scope.row)">Deposit</el-button>
           <el-button v-if="scope.row.state == 0" type="danger" size="small" @click="handleMakeBill(scope.$index, scope.row)">MakeBill</el-button>
         </template>
@@ -53,7 +52,6 @@
 
     <!--分页工具条-->
     <el-col :span="24" class="toolbar">
-      <el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">Batch-Delete</el-button>
       <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
@@ -75,7 +73,7 @@
           <el-input type="text" v-model="saveForm.clueId" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="产品Id">
-          <el-input type="number" v-model="saveForm.productId" auto-complete="off"></el-input>
+          <el-input type="number" v-model="saveForm.product.id" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="产品价格">
           <el-input type="number" v-model="saveForm.productPrice" auto-complete="off"></el-input>
@@ -92,6 +90,38 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="saveFormVisible = false">取消</el-button>
         <el-button type="primary" @click.native="saveSubmit" :loading="addLoading">提交</el-button>
+      </div>
+    </el-dialog>
+
+    <!--缴纳定金 编辑界面-->
+    <el-dialog title="新增/修改" :visible.sync="depositVisible" :close-on-click-modal="false">
+      <el-form :model="saveForm" label-width="80px" :rules="saveFormRules" ref="addForm">
+        <el-form-item label="商机名称">
+          <el-input v-model="saveForm.name" disabled auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="产品名称">
+          <el-input type="text" v-model="saveForm.productName" disabled auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="产品价格">
+          <el-input type="number" v-model="saveForm.productPrice" disabled auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="订单金额">
+          <el-input type="number" v-model="payDeposit.deposit" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="营销活动">
+          <el-select v-model="payDeposit.activityIds" value-key="id" multiple placeholder="请选择活动">
+            <el-option
+                v-for="item in Activitys"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click.native="depositVisible = false">取消</el-button>
+        <el-button type="primary" @click.native="saveDeposit" :loading="addLoading">提交</el-button>
       </div>
     </el-dialog>
 
@@ -143,10 +173,65 @@ export default {
         state: null
       },
 
+      //缴纳定金data
+      depositVisible: false,
+      payDeposit:{
+        businessId: null,
+        deposit:null,
+        activityIds:[]
+      },
+      Activitys: []   //获取营销活动，渲染下拉框
     }
   },
 
   methods: {
+
+    //缴纳定金弹框
+    handleDeposit:function (index,row){
+      this.depositVisible = true;
+      this.saveForm.name = row.name;
+      this.payDeposit.businessId = row.id;
+      this.saveForm.productName = row.productName;
+      this.saveForm.productPrice = row.productPrice;
+      //渲染下拉框
+      this.getActivitys()
+      console.log(this.payDeposit)
+    },
+
+    //缴纳定金提交接口
+    saveDeposit(){
+      this.$confirm('是否确认提交?', '提示', {}).then(() => {
+        this.addLoading = true;
+        this.$http.post("/business/saveDeposit",this.payDeposit)
+            .then(result => {
+              result = result.data;
+              if(result.success){
+                this.addLoading = false;
+                this.depositVisible = false;
+                this.getBusiness();
+                this.$message({message: '缴纳订金成功', type: 'success'});
+              }else{
+                this.$message({message: result.message, type: 'error'});
+              }
+            })
+      });
+    },
+
+    //获取所有营销活动
+    getActivitys() {
+      this.$http.get("/activity/type/1")
+          .then(result => {
+            result = result.data;
+            if (result.success) {
+              this.Activitys = result.resultObj;
+            } else {
+              this.$message({message: '获取所有营销活动失败' + result.message, type: 'error'});
+            }
+          })
+          .catch(result => {
+            this.$message({message: result.message, type: 'error'});
+          })
+    },
 
     search() {
       this.query.currentPage = 1;
@@ -182,72 +267,6 @@ export default {
           .catch(result => {
             this.$message({message: result.message, type: 'error'});
           })
-    },
-
-    //根据id删除
-    handleDel: function (index, row) {
-      this.$confirm('确认删除该记录吗?', '提示', {
-        type: 'warning'
-      }).then(() => {
-        this.listLoading = true;
-        this.$http.delete("/business/" + row.id)
-            .then(result => {
-              result = result.data;
-              this.listLoading = false;
-              if (result.success) {
-                this.$message({message: '删除成功', type: 'success'});
-                this.query.currentPage = 1;
-                this.getBusiness();
-              } else {
-                this.$message({message: result.message, type: 'error'});
-              }
-            })
-            .catch(result => {
-              this.$message({message: '很抱歉，网络有误', type: 'error'});
-            })
-      }).catch(() => {
-        this.$message({message: '已取消删除', type: 'info'});
-      });
-    },
-
-    //批量删除
-    batchRemove: function () {
-      //遍历选中的sels数组的id值给ids
-      var ids = this.sels.map(item => item.id);
-      this.$confirm('确认删除选中记录吗？', '提示', {
-        type: 'warning'
-      }).then(() => {
-        this.listLoading = true;
-        // 调用批量删除接口
-        this.$http.patch("/business", ids)
-            .then(result => {
-              result = result.data;
-              this.listLoading = false;
-              if (result.success) {
-                this.$message({message: '批量删除成功!', type: 'success'});
-                this.query.currentPage = 1;
-                this.getBusiness();
-              } else {
-                this.$message({message: result.message, type: 'error'});
-              }
-            })
-      }).catch(() => {
-          this.$message({message: result.message, type: 'error'});
-      });
-    },
-
-    //批量添加
-    batchAdd:function (){
-      //遍历选中的sels数组的id值给ids
-      var ids = this.sels.map(item => item.id);
-      this.$confirm('确认删除选中记录吗？', '提示', {
-        type: 'warning'
-      }).then(() => {
-        this.listLoading = true;
-
-      }).catch(() => {
-        this.$message({message: result.message, type: 'error'});
-      });
     },
 
     //显示修改界面

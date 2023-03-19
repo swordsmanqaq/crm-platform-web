@@ -20,17 +20,17 @@
               style="width: 100%;">
       <el-table-column type="selection" width="55">
       </el-table-column>
-      <el-table-column type="index" width="100">
+      <el-table-column type="index" width="50">
       </el-table-column>
-      <el-table-column prop="sn" label="唯一标识" width="200" sortable>
+      <el-table-column prop="sn" label="唯一标识" width="300" sortable>
       </el-table-column>
       <el-table-column prop="productName" label="产品名称" width="150" sortable>
       </el-table-column>
-      <el-table-column prop="price" label="商品价格" width="150" sortable>
+      <el-table-column prop="price" label="商品价格" width="120" sortable>
       </el-table-column>
-      <el-table-column prop="customerName" label="用户名称" width="180" sortable>
+      <el-table-column prop="customerName" label="用户名称" width="100" sortable>
       </el-table-column>
-      <el-table-column prop="state" label="状态" width="120" sortable>
+      <el-table-column prop="state" label="状态" width="100" sortable>
         <template slot-scope="scope">
           <span v-if="scope.row.state === 0" style="color: blue;">代付款</span>
           <span v-if="scope.row.state === 1" style="color: green;">已付定金</span>
@@ -43,7 +43,9 @@
         <template scope="scope">
           <el-button size="small" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
           <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">Delete</el-button>
-          <el-button type="danger" v-if="scope.row.state == 1" size="small" @click="handlePayBalance(scope.$index, scope.row)">Pay-Balance</el-button>
+          <el-button type="danger" v-if="scope.row.state == 1" size="small"
+                     @click="handlePayBalance(scope.$index, scope.row)">Pay-Balance
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -93,14 +95,14 @@
         <el-form-item label="商品名称">
           <el-input v-model="payBalance.productName" disabled auto-complete="off"></el-input>
         </el-form-item>
-        <el-form-item label="订单金额">
+        <el-form-item label="商品价格">
           <el-input v-model="payBalance.price" disabled auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="订金金额">
           <el-input v-model="payBalance.deposit" disabled auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="未支付金额">
-          <el-input v-model="payBalance.noPayMoney" disabled auto-complete="off"></el-input>
+          <el-input v-model="payBalance.unPaid" disabled auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="支付模式">
           <el-select v-model="payBalance.payModel" placeholder="请选择">
@@ -160,41 +162,97 @@ export default {
 
       // 付尾款的data
       payBalanceVisible: false,
-      payBalance:{
-        sn:'',
-        productName:'',
-        price:null,
-        deposit:null,
-        noPayMoney:null,
-        payModel:{
-          id:null,
-          name:''
+      payBalance: {
+        id: null,
+        sn: '',
+        productName: '',
+        price: null,
+        deposit: null,
+        unPaid: null,
+        payModel: {
+          id: null,
+          title: '',
+          value: ''
         }
       },
-      payModels:[]
+      payModels: []
     }
   },
 
   methods: {
 
-    orderPayBalance(){
-
+    //订单提交
+    orderPayBalance() {
+      this.$confirm('是否确认提交?', '提示', {}).then(() => {
+        this.addLoading = true;
+        this.$http.post("/order/paybalance",this.payBalance)
+            .then(result => {
+              result = result.data;
+              if(result.success){
+                this.addLoading = false;
+                this.getOrders()
+                this.payBalanceVisible = false;
+                this.$message({message: '支付成功', type: 'success'});
+              }else{
+                this.$message({message: result.message, type: 'error'});
+              }
+            })
+      });
     },
+
+    //付尾款弹框
+    handlePayBalance: function (index, row) {
+      this.payBalanceVisible = true;
+      this.payBalance.id = row.id;
+      this.payBalance.sn = row.sn;
+      this.payBalance.productName = row.productName;
+      this.payBalance.price = row.price;
+      this.getOrderDeposit(row.id)
+      this.getPayModel();
+    },
+
+    //获取支付方式
+    getPayModel() {
+      this.$http.get("/dictionaryitem/sn/payModel")
+          .then(result => {
+            result = result.data;
+            if (result.success) {
+              this.payModels = result.resultObj;
+            }else {
+
+            }
+          }).catch( result => {
+
+      })
+    },
+
+    // 获取订金金额
+    getOrderDeposit(id) {
+      this.$http.get("/deposit/id/" + id)
+          .then(result => {
+            result = result.data;
+            if (result.success) {
+              this.payBalance.deposit = result.resultObj.deposit;
+              this.payBalance.unPaid = this.payBalance.price - this.payBalance.deposit;
+            }
+          })
+    },
+
 
     search() {
       this.query.currentPage = 1;
-      this.getConfigs();
+      this.getOrders();
     },
 
     handleSizeChange(val) {
       this.query.pageSize = val;
       this.query.currentPage = 1;
-      this.getConfigs();
+      this.getOrders();
     },
 
     handleCurrentChange(val) {
       this.query.currentPage = val;
-      this.getConfigs();
+      this.getOrders();
     },
 
     selsChange: function (sels) {
@@ -202,8 +260,8 @@ export default {
     },
 
     //获取角色列表
-    getConfigs() {
-      this.$http.post("/config", this.query)
+    getOrders() {
+      this.$http.post("/order", this.query)
           .then(result => {
             result = result.data;
             if (result.success) {
@@ -223,14 +281,14 @@ export default {
         type: 'warning'
       }).then(() => {
         this.listLoading = true;
-        this.$http.delete("/config/" + row.id)
+        this.$http.delete("/order/" + row.id)
             .then(result => {
               result = result.data;
               this.listLoading = false;
               if (result.success) {
                 this.$message({message: '删除成功', type: 'success'});
                 this.query.currentPage = 1;
-                this.getConfigs();
+                this.getOrders();
               } else {
                 this.$message({message: result.message, type: 'error'});
               }
@@ -252,20 +310,20 @@ export default {
       }).then(() => {
         this.listLoading = true;
         // 调用批量删除接口
-        this.$http.patch("/config", ids)
+        this.$http.patch("/order", ids)
             .then(result => {
               result = result.data;
               this.listLoading = false;
               if (result.success) {
                 this.$message({message: '批量删除成功!', type: 'success'});
                 this.query.currentPage = 1;
-                this.getConfigs();
+                this.getOrders();
               } else {
                 this.$message({message: result.message, type: 'error'});
               }
             })
       }).catch(() => {
-          this.$message({message: result.message, type: 'error'});
+        this.$message({message: result.message, type: 'error'});
       });
     },
 
@@ -294,18 +352,18 @@ export default {
           this.$confirm('确认提交吗？', '提示', {}).then(() => {
             this.addLoading = true;
 
-            this.$http.put("/config", this.saveForm)
+            this.$http.put("/order", this.saveForm)
                 .then(result => {
                   result = result.data;
                   if (result.success) {
                     this.query.currentPage = 1;
-                    this.getConfigs();
+                    this.getOrders();
                     this.addLoading = false;
                     this.saveFormVisible = false;
                     this.$message({message: '保存成功', type: 'success'});
                   }
                 }).catch(result => {
-                  this.$message({message: result.message, type: 'error'});
+              this.$message({message: result.message, type: 'error'});
             })
           });
         }
@@ -316,7 +374,7 @@ export default {
 
   mounted() {
     // 钩子函数，页面加载后，调用此方法
-    this.getConfigs();
+    this.getOrders();
   }
 }
 

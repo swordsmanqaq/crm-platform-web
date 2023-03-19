@@ -17,6 +17,9 @@ import routes from './routes'
 
 //导入axios
 import axios from "axios";
+//导入JsonExcel
+import JsonExcel from "vue-json-excel";
+Vue.component('downloadExcel', JsonExcel)
 
 axios.defaults.baseURL = '/api'  // http://localhost:8082/api
 Vue.prototype.$http = axios

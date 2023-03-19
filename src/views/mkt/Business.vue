@@ -9,12 +9,6 @@
         <el-form-item>
           <el-button type="primary" v-on:click="search">Search</el-button>
         </el-form-item>
-<!--        <el-form-item>-->
-<!--          <el-button type="primary" @click="handleAdd">Add</el-button>-->
-<!--        </el-form-item>-->
-<!--        <el-form-item>-->
-<!--          <el-button type="primary" @click="batchAdd" :disabled="this.sels.length===0">Batch-Add</el-button>-->
-<!--        </el-form-item>-->
       </el-form>
     </el-col>
 

@@ -13,7 +13,20 @@
           <el-button type="primary" @click="handleAdd">Add</el-button>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="batchAdd" :disabled="this.sels.length===0">Batch-Add</el-button>
+          <el-upload
+              class="upload-demo"
+              :action="importUrl"
+              :on-success="uploadSuccess"
+              accept=".xlsx"
+              :show-file-list="false"
+              multiple
+              :limit="3"
+              :on-exceed="handleExceed">
+            <el-button type="success" plain icon="el-icon-download" size="small">Import</el-button>
+          </el-upload>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" size="small" plain icon="el-icon-upload2" @click="exportExcel">Export</el-button>
         </el-form-item>
       </el-form>
     </el-col>
@@ -237,6 +250,7 @@
       </div>
     </el-dialog>
 
+
   </section>
 </template>
 
@@ -328,12 +342,53 @@ export default {
           name: ""
         }
       },
-      products: []
+      products: [],
+
+      //导入data
+      importUrl: '/api/clue/importExcel',
+
 
     }
   },
 
   methods: {
+
+    //导出
+    exportExcel(){
+      // this.$http.post("/clue/exportExcel", this.query)
+      //     .then(result => {
+      //       result = result.data;
+      //       if (result.success) {
+      //         this.getClues();
+      //       } else {
+      //         this.$message({message: '分页查询失败' + result.message, type: 'error'});
+      //       }
+      //     })
+      //     .catch(result => {
+      //       this.$message({message: result.message, type: 'error'});
+      //     })
+
+      // window.location.href = '/api/clue/exportExcel/' + this.query.keyword
+
+      // if (this.query.keyword){
+      //   window.location.href = "/api/clue/exportExcel/" + this.query.keyword
+      // }else {
+      //   window.location.href = "/api/clue/exportExcel"
+      // }
+
+      window.location.href = "/api/clue/exportExcel/" + this.query.keyword
+
+    },
+    //导入
+    uploadSuccess() {
+      this.$message.success("导入成功");
+      this.getClues();
+
+    },
+
+    handleExceed(){
+    },
+
 
     search() {
       this.query.currentPage = 1;

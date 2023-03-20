@@ -48,7 +48,7 @@
       </el-table-column>
       <el-table-column prop="employee.username" label="营销人员" width="100" sortable>
       </el-table-column>
-      <el-table-column prop="description" label="描述" width="110" sortable>
+      <el-table-column prop="email" label="邮箱" width="110" sortable>
       </el-table-column>
       <el-table-column prop="state" label="状态" width="120" sortable>
         <template slot-scope="scope">
@@ -251,7 +251,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="clueTransferVisible = false">取消</el-button>
-        <el-button type="primary" @click.native="saveClueAssign" :loading="addLoading">提交</el-button>
+        <el-button type="primary" @click.native="saveClueTransfer" :loading="addLoading">提交</el-button>
       </div>
     </el-dialog>
 
@@ -380,7 +380,7 @@ export default {
       products: [],
 
       //导入data
-      importUrl: '/api/clue/importExcel',
+      importUrl: 'http://localhost:8080/clue/importExcel',
 
 
     }
@@ -411,7 +411,7 @@ export default {
       //   window.location.href = "/api/clue/exportExcel"
       // }
 
-      window.location.href = "/api/clue/exportExcel/" + this.query.keyword
+      window.location.href = "http://localhost:8080/clue/exportExcel/" + this.query.keyword
 
     },
     //导入
@@ -631,7 +631,6 @@ export default {
       }).then(() => {
         this.$http.post("/clue/activity", this.clueActivity)
             .then(result => {
-              console.log(this.clueActivity)
               result = result.data;
               if (result.success) {
                 this.setActivityVisible = false;
@@ -663,6 +662,7 @@ export default {
             .then(result => {
               result = result.data;
               if (result.success) {
+                this.addLoading = false;
                 this.$message({message: "分配成功", type: 'success'});
                 this.clueAssignVisible = false;
                 this.getClues();
@@ -691,6 +691,7 @@ export default {
             .then(result => {
               result = result.data;
               if (result.success) {
+                this.addLoading = false;
                 this.$message({message: "跟进成功!", type: 'success'});
                 this.clueFollowVisible = false;
                 this.getClues();
@@ -712,7 +713,26 @@ export default {
     },
 
     //转交提交
-
+    saveClueTransfer() {
+      this.$confirm('确认提交吗？', '提示', {}).then(() => {
+        this.addLoading = true;
+        this.$http.post("/clue/assign", this.assign)
+            .then(result => {
+              result = result.data;
+              if (result.success) {
+                this.addLoading = false;
+                this.$message({message: "分配成功", type: 'success'});
+                this.clueTransferVisible = false;
+                this.getClues();
+              } else {
+                this.$message({message: result.message, type: 'error'});
+              }
+            })
+            .catch(result => {
+              this.$message({message: "网络异常", type: 'error'});
+            })
+      });
+    },
 
     //转换商机弹框
     handleBusiness: function (index, row) {
@@ -741,6 +761,7 @@ export default {
             .then(result => {
               result = result.data;
               if (result.success) {
+                this.addLoading = false;
                 this.transformBusinessVisible = false;
                 this.$message({message: "转换商机成功!", type: 'success'});
                 this.getClues();
@@ -763,6 +784,7 @@ export default {
             .then(result => {
               result = result.data;
               if (result.success) {
+                this.addLoading = false;
                 this.$message({message: "放入线索池成功!", type: 'success'});
                 this.getClues();
               } else {

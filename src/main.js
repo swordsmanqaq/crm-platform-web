@@ -21,7 +21,8 @@ import axios from "axios";
 import JsonExcel from "vue-json-excel";
 Vue.component('downloadExcel', JsonExcel)
 
-axios.defaults.baseURL = '/api'  // http://localhost:8082/api
+//axios.defaults.baseURL = '/api'  // http://localhost:8082/api
+axios.defaults.baseURL = 'http://localhost:8080'
 Vue.prototype.$http = axios
 
 Vue.use(ElementUI)

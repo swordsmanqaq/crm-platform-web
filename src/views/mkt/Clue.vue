@@ -68,6 +68,9 @@
           <el-button type="success" v-if="scope.row.state == 1" size="small"
                      @click="handleFollow(scope.$index, scope.row)">Follow
           </el-button>
+          <el-button type="success" v-if="scope.row.state == 1" size="small"
+                     @click="handleTransfer(scope.$index, scope.row)">Transfer
+          </el-button>
           <el-button type="primary" v-if="scope.row.state == (0 || 1)" size="small" @click="handleBusiness(scope.$index, scope.row)">Business</el-button>
           <el-button type="info" size="small" @click="handleScrap(scope.$index, scope.row)">Scrap</el-button>
         </template>
@@ -221,6 +224,37 @@
       </div>
     </el-dialog>
 
+    <!-- 转交弹框 -->
+    <el-dialog title="分配" :visible.sync="clueTransferVisible" :close-on-click-modal="false">
+      <el-form :model="assign" label-width="80px" ref="bindActivityForm">
+        <el-form-item label="姓名">
+          <el-input v-model="assign.fullName" disabled auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input v-model="assign.phone" disabled auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="地址">
+          <el-input v-model="assign.address" disabled auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="营销人员">
+          <el-select v-model="assign.employee" clearable value-key="id" placeholder="请选择营销人员">
+            <el-option
+                v-for="item in employees"
+                :key="item.id"
+                :label="item.username"
+                :value="item">
+              <span style="float: left">{{ item.username }}</span>
+              <span style="float: right; color: #8492a6; font-size: 13px">{{ item.email }}</span>
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click.native="clueTransferVisible = false">取消</el-button>
+        <el-button type="primary" @click.native="saveClueAssign" :loading="addLoading">提交</el-button>
+      </div>
+    </el-dialog>
+
     <!-- 转换商机弹框 -->
     <el-dialog title="转换商机" :visible.sync="transformBusinessVisible" :close-on-click-modal="false">
       <el-form :model="business" label-width="120px" ref="bindActivityForm">
@@ -315,6 +349,7 @@ export default {
       //分配-跟进 按钮data
       clueAssignVisible: false,  //分配弹框
       clueFollowVisible: false,  //跟进弹框
+      clueTransferVisible: false, //转交弹框
       assign: {
         id: null,
         employee: {
@@ -668,6 +703,15 @@ export default {
             })
       });
     },
+
+    //转交弹框
+    handleTransfer:function (index,row){
+      this.clueTransferVisible = true;
+      this.assign = Object.assign({}, row);
+      this.getAllEmployees();
+    },
+
+    //转交提交
 
 
     //转换商机弹框

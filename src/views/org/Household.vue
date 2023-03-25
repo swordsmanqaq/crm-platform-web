@@ -20,13 +20,17 @@
               style="width: 100%;">
       <el-table-column type="selection" width="55">
       </el-table-column>
-      <el-table-column type="index" width="60">
+      <el-table-column type="index" width="100">
       </el-table-column>
-      <el-table-column prop="username" label="姓名" width="110" sortable>
+      <el-table-column prop="username" label="姓名" width="150" sortable>
       </el-table-column>
-      <el-table-column prop="age" label="年龄" width="80" sortable>
+      <el-table-column prop="age" label="年龄" width="110" sortable>
       </el-table-column>
-      <el-table-column label="操作" width="250">
+      <el-table-column prop="checkTime" label="入住时间" width="240" sortable>
+      </el-table-column>
+      <el-table-column prop="leaveTime" label="离开时间" width="240" sortable>
+      </el-table-column>
+      <el-table-column label="操作" width="28 0">
         <template scope="scope">
           <el-button size="small" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
           <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">Delete</el-button>
@@ -52,32 +56,42 @@
     <!--编辑界面-->
     <el-dialog title="新增/修改" :visible.sync="saveFormVisible" :close-on-click-modal="false">
       <el-form :model="saveForm" label-width="80px" :rules="saveFormRules" ref="addForm">
-        <el-form-item label="姓名">
-          <el-input v-model="saveForm.username" auto-complete="off"></el-input>
+        <el-form-item label="姓名" prop="username">
+          <el-input type="text" v-model="saveForm.username"></el-input>
         </el-form-item>
-        <el-form-item label="密码">
+        <el-form-item label="密码" prop="password">
           <el-input type="text" v-model="saveForm.password"></el-input>
-        </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-          <el-input type="text" v-model="saveForm.email"></el-input>
-        </el-form-item>
-        <el-form-item label="头像">
-          <el-input type="textarea" v-model="saveForm.headImage"></el-input>
         </el-form-item>
         <el-form-item label="年龄">
           <el-input type="number" v-model="saveForm.age" style="width: 100px"></el-input>
         </el-form-item>
-        <el-form-item label="所属部门">
-          <el-select v-model="saveForm.department" clearable value-key="id" placeholder="请选择部门">
-            <el-option
-                v-for="item in departments"
-                :key="item.id"
-                :label="item.name"
-                :value="item">
-              <span style="float: left">{{ item.name }}</span>
-              <span style="float: right; color: #8492a6; font-size: 13px">{{ item.intro }}</span>
-            </el-option>
-          </el-select>
+        <el-form-item label="入住时间">
+          <template>
+            <div class="block">
+              <span class="demonstration"></span>
+              <el-date-picker
+                  v-model="saveForm.checkTime"
+                  format="yyyy-MM-dd HH:mm:ss"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  type="datetime"
+                  placeholder="选择日期">
+              </el-date-picker>
+            </div>
+          </template>
+        </el-form-item>
+        <el-form-item label="离开时间">
+          <template>
+            <div class="block">
+              <span class="demonstration"></span>
+              <el-date-picker
+                  v-model="saveForm.leaveTime"
+                  format="yyyy-MM-dd HH:mm:ss"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  type="datetime"
+                  placeholder="选择日期">
+              </el-date-picker>
+            </div>
+          </template>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -132,11 +146,11 @@ export default {
       saveFormVisible: false, //编辑界面是否显示
       addLoading: false,
       saveFormRules: {
-        name: [
+        username: [
           {required: true, message: '请输入名字', trigger: 'blur'}
         ],
-        email: [
-          {required: true, message: '请输入邮箱', trigger: 'blur'}
+        password: [
+          {required: true, message: '请输入密码', trigger: 'blur'}
         ]
       },
 
@@ -145,21 +159,15 @@ export default {
         id: null,
         username: '',
         password: '',
-        email: '',
-        headImage: '',
         age: null,
-        department: {
-          id: null,
-          name: ""
-        }
+        checkTime: '',
+        leaveTime: ''
       },
-      departments: [],
-
 
       //设置角色相关data
       setRoleVisible: false,  //弹框控制
       EmployeeRole: {
-        employeeId: null,
+        householdId: null,
         roleId: []
       },
       isIndeterminate: false,   //多选的状态
@@ -182,7 +190,7 @@ export default {
       this.setRoleVisible = true;
       this.getRoles();
       this.getAllRoleIds();
-      this.EmployeeRole.employeeId = row.id;
+      this.EmployeeRole.householdId = row.id;
       //传当前对象的id做数据回显
       this.getRoleByRoleId(row.id);
     },
@@ -213,9 +221,9 @@ export default {
       })
     },
 
-    //根据employeeId做回显
-    getRoleByRoleId(employeeId) {
-      this.$http.get("/employee/role/" + employeeId)
+    //根据householdId做回显
+    getRoleByRoleId(householdId) {
+      this.$http.get("/household/role/" + householdId)
           .then(result => {
             result = result.data;
             if (result.success) {
@@ -237,13 +245,13 @@ export default {
       this.$confirm('确认提交菜单选择吗?', '提示', {
         type: 'warning'
       }).then(() => {
-        this.$http.post("/employee/role", this.EmployeeRole)
+        this.$http.post("/household/role", this.EmployeeRole)
             .then(result => {
               result = result.data;
               if (result.success) {
                 this.setRoleVisible = false;
                 this.$message({message: result.message, type: 'success'});
-              }else {
+              } else {
                 this.$message({message: result.message, type: 'error'});
               }
             }).catch(result => {
@@ -262,32 +270,34 @@ export default {
       this.isIndeterminate = checkedLength > 0 && checkedLength < this.allRoleIds.length;
     },
 
-
-
     search() {
       // 设置query.currengPage为1,当进行搜索时,从第一页开始重新进行搜索
       this.query.currentPage = 1;
       //调用查询
-      this.getEmployees();
+      this.getHouseholds();
     },
 
     handleSizeChange(val) {
       this.query.pageSize = val;
       this.query.currentPage = 1;
       //查询结果
-      this.getEmployees();
+      this.getHouseholds();
     },
 
     handleCurrentChange(val) {
       // val为当前页，赋值后重新进行查询
       this.query.currentPage = val;
       // 调用查询方法
-      this.getEmployees();
+      this.getHouseholds();
     },
 
-    //获取员工列表
-    getEmployees() {
-      this.$http.post("/employee/page", this.query)
+    selsChange: function (sels) {
+      this.sels = sels;
+    },
+
+    //获取住户列表
+    getHouseholds() {
+      this.$http.post("/household/page", this.query)
           .then(result => {
             result = result.data;
             if (result.success) {
@@ -301,13 +311,13 @@ export default {
           })
     },
 
-    //员工删除
+    //住户删除
     handleDel: function (index, row) {
       this.$confirm('确认删除该记录吗?', '提示', {
         type: 'warning'
       }).then(() => {
         this.listLoading = true;
-        this.$http.delete("/employee/" + row.id)
+        this.$http.delete("/household/" + row.id)
             .then(result => {
               result = result.data;
               this.listLoading = false;
@@ -316,7 +326,7 @@ export default {
                 //删除成功后回到第一页
                 this.query.currentPage = 1;
                 // 删除成功,要重新刷新该页面，调用方法查询
-                this.getEmployees();
+                this.getHouseholds();
               } else {
                 this.$message({message: result.message, type: 'error'});
               }
@@ -329,46 +339,50 @@ export default {
       });
     },
 
-    //获取所有部门
-    getAllDepartment() {
-      this.$http.get("/department/emp")
-          .then(result => {
-            result = result.data;
-            if (result.success) {
-              this.departments = result.resultObj;
-            } else {
-              this.$message({message: '查询失败' + result.message, type: 'error'});
-            }
-          }).catch(result => {
-        this.$message({message: result.message, type: 'error'});
-      })
+    //批量删除住户
+    batchRemove: function () {
+      //遍历选中的sels数组的id值给ids
+      var ids = this.sels.map(item => item.id);
+      this.$confirm('确认删除选中记录吗？', '提示', {
+        type: 'warning'
+      }).then(() => {
+        this.listLoading = true;
+        // 调用批量删除接口
+        this.$http.patch("/household", ids)
+            .then(result => {
+              result = result.data;
+              this.listLoading = false;
+              if (result.success) {
+                this.$message({message: '批量删除成功!', type: 'success'});
+                //删除后回到第一页
+                this.query.currentPage = 1;
+                //调用查询
+                this.getHouseholds();
+              } else {
+                this.$message({message: result.message, type: 'error'});
+              }
+            })
+      }).catch(() => {
+        this.$message({message: "网络错误", type: 'error'});
+      });
     },
-
 
     //显示修改界面(回显数据)
     handleEdit: function (index, row) {
       this.saveFormVisible = true;
       this.saveForm = Object.assign({}, row);
-      //调用方法让下拉框有值
-      this.getAllDepartment();
     },
 
     //显示新增界面
     handleAdd: function () {
       this.saveFormVisible = true;
-      //调用部门方法，给下拉框增加数据
-      this.getAllDepartment();
       this.saveForm = {
         id: null,
         username: '',
         password: '',
-        email: '',
-        headImage: '',
         age: null,
-        department: {
-          id: null,
-          name: ""
-        }
+        checkTime: '',
+        leaveTime: ''
       };
     },
 
@@ -379,13 +393,13 @@ export default {
           this.$confirm('确认提交吗？', '提示', {}).then(() => {
             this.addLoading = true;
             var para = this.saveForm;
-            this.$http.post("/employee/save", para)
+            this.$http.post("/household/save", para)
                 .then(result => {
                   result = result.data;
                   if (result.success) {
                     //从第一页开始展示
                     this.query.currentPage = 1;
-                    this.getEmployees();
+                    this.getHouseholds();
                     //关闭加载框
                     this.addLoading = false;
                     //关闭弹框
@@ -398,44 +412,13 @@ export default {
           });
         }
       });
-    },
-
-    selsChange: function (sels) {
-      this.sels = sels;
-    },
-
-    //批量删除员工
-    batchRemove: function () {
-      //遍历选中的sels数组的id值给ids
-      var ids = this.sels.map(item => item.id);
-      this.$confirm('确认删除选中记录吗？', '提示', {
-        type: 'warning'
-      }).then(() => {
-        this.listLoading = true;
-        // 调用批量删除接口
-        this.$http.patch("/employee", ids)
-            .then(result => {
-              result = result.data;
-              this.listLoading = false;
-              if (result.success) {
-                this.$message({message: '批量删除成功!', type: 'success'});
-                //删除后回到第一页
-                this.query.currentPage = 1;
-                //调用查询
-                this.getEmployees();
-              } else {
-                this.$message({message: result.message, type: 'error'});
-              }
-            })
-      }).catch(() => {
-        this.$message({message: "网络错误", type: 'error'});
-      });
     }
+
   },
 
   mounted() {
     // 钩子函数，页面加载后，调用此方法，加载部门
-    this.getEmployees();
+    this.getHouseholds();
   }
 }
 

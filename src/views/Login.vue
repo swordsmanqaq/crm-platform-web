@@ -55,7 +55,7 @@ export default {
                 this.logining = false;
                 if (result.success) {
                   this.$message({message: "登录成功", type: 'success'});
-                  //把后端返回的token和employee存储到localStorage中
+                  //把后端返回的token和household存储到localStorage中
                   localStorage.setItem("token", result.resultObj.token);
                   localStorage.setItem("loginUser", JSON.stringify(result.resultObj.loginUser));
                   //跳转首页

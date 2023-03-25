@@ -380,7 +380,7 @@ export default {
       products: [],
 
       //导入data
-      importUrl: 'http://localhost:8081/clue/importExcel',
+      importUrl: 'http://47.120.8.237:8081/clue/importExcel',
 
 
     }
@@ -411,7 +411,7 @@ export default {
       //   window.location.href = "/api/clue/exportExcel"
       // }
 
-      window.location.href = "http://localhost:8081/clue/exportExcel/" + this.query.keyword
+      window.location.href = "http://47.120.8.237:8081/clue/exportExcel/" + this.query.keyword
 
     },
     //导入

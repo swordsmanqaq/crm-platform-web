@@ -24,13 +24,7 @@
       </el-table-column>
       <el-table-column prop="username" label="姓名" width="110" sortable>
       </el-table-column>
-      <el-table-column prop="email" label="邮箱" width="250" sortable>
-      </el-table-column>
-      <el-table-column prop="headImage" label="头像" width="250" sortable>
-      </el-table-column>
       <el-table-column prop="age" label="年龄" width="80" sortable>
-      </el-table-column>
-      <el-table-column prop="department.name" label="所属部门" width="120" sortable>
       </el-table-column>
       <el-table-column label="操作" width="250">
         <template scope="scope">
@@ -44,8 +38,6 @@
     <!--工具条-->
     <el-col :span="24" class="toolbar">
       <el-button type="danger" @click="batchRemove" :disabled="this.sels.length===0">Batch-Delete</el-button>
-      <!--      @size-change 当每页显示条数的值发生改变时会触发-->
-      <!--      @current-change 当 当前页的值发生改变时会触发-->
       <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"

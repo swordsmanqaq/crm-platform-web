@@ -1,25 +1,16 @@
 import Login from './views/Login.vue'
 import NotFound from './views/404.vue'
 import Home from './views/Home.vue'
-import Main from './views/Main.vue'
-import Table from './views/nav1/Table.vue'
 import Form from './views/nav1/Form.vue'
 import user from './views/nav1/user.vue'
-import Page4 from './views/nav2/Page4.vue'
-import Page5 from './views/nav2/Page5.vue'
 import Page6 from './views/nav3/Page6.vue'
 import echarts from './views/charts/echarts.vue'
 //==================导入.vue文件=======================
-import Department from "./views/org/Department";
-import Employee from "./views/org/Employee";
+import Household from "./views/org/Household";
 import Permission from "./views/auth/Permission";
 import Role from "./views/auth/Role";
 import Menus from "./views/auth/Menus";
 import NotPermission from './views/403.vue'
-import Config from "./views/sys/Config";
-import Dictionary from "./views/sys/Dictionary";
-import DictionaryItem from "./views/sys/DictionaryItem";
-
 
 let routes = [
     {
@@ -59,8 +50,7 @@ let routes = [
         name: '组织机构管理',
         iconCls: 'el-icon-message',//图标样式class
         children: [
-            { path: '/department', component: Department, name: '部门管理' },
-            { path: '/employee', component: Employee, name: '员工管理' },
+            { path: '/household', component: Household, name: '住户管理' },
             { path: '/form', component: Form, name: 'Form' },
             { path: '/user', component: user, name: '列表' },
         ]
@@ -74,40 +64,6 @@ let routes = [
             { path: '/permission', component: Permission, name: '权限管理' },
             { path: '/role', component: Role, name: '角色管理' },
             { path: '/menu', component: Menus, name: '菜单管理' }
-        ]
-    },
-    {
-        path: '/',
-        component: Home,
-        name: '系统管理',
-        iconCls: 'el-icon-message',
-        children: [
-            { path: '/config', component: Config, name: '系统配置' },
-            { path: '/dictionary', component: Dictionary, name: '数据字典' },
-            { path: '/dictionaryitem', component: DictionaryItem, name: '数据字典明细' }
-        ]
-    },
-    //{ path: '/main', component: Main },
-    {
-        path: '/',
-        component: Home,
-        name: '导航一',
-        iconCls: 'el-icon-message',//图标样式class
-        children: [
-            { path: '/main', component: Main, name: '主页', hidden: true },
-            { path: '/table', component: Table, name: 'Table' },
-            { path: '/form', component: Form, name: 'Form' },
-            { path: '/user', component: user, name: '列表' },
-        ]
-    },
-    {
-        path: '/',
-        component: Home,
-        name: '导航二',
-        iconCls: 'fa fa-id-card-o',
-        children: [
-            { path: '/page4', component: Page4, name: '页面4' },
-            { path: '/page5', component: Page5, name: '页面5' }
         ]
     },
     {

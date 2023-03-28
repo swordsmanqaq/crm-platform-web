@@ -19,14 +19,20 @@ import NotPermission from './views/403.vue'
 import Config from "./views/sys/Config";
 import Dictionary from "./views/sys/Dictionary";
 import DictionaryItem from "./views/sys/DictionaryItem";
-import Shop from "./views/org/Shop";
 import shop from "./views/org/Shop";
+import ShopRegister from "./views/org/ShopRegister";
 
 
 let routes = [
     {
         path: '/login',
         component: Login,
+        name: '',
+        hidden: true
+    },
+    {
+        path: '/shopRegister',
+        component: ShopRegister,
         name: '',
         hidden: true
     },

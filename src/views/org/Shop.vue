@@ -55,6 +55,7 @@
         <template scope="scope">
           <el-button size="small" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
           <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">Delete</el-button>
+          <el-button type="success" size="small" @click="handleAudit(scope.$index, scope.row)" v-if="scope.row.state === 1">Audit</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -105,6 +106,26 @@
       </div>
     </el-dialog>
 
+    <!--手动激活界面-->
+    <el-dialog title="手动激活" :visible.sync="saveAuditVisible" :close-on-click-modal="false">
+      <el-form :model="saveForm" label-width="80px" :rules="saveFormRules" ref="addForm">
+        <el-form-item label="门店名称" prop="name">
+          <el-input v-model="saveForm.name" auto-complete="off" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input type="text" v-model="saveForm.tel" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="地址">
+          <el-input type="textarea" v-model="saveForm.address" disabled></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click.native="saveAuditVisible = false">Cancel</el-button>
+        <el-button type="danger" @click.native="saveReject" :loading="addLoading">Reject</el-button>
+        <el-button type="primary" @click.native="saveSuccessful" :loading="addLoading">Successful</el-button>
+      </div>
+    </el-dialog>
+
 
   </section>
 </template>
@@ -144,7 +165,11 @@ export default {
         state: '',
         address: '',
         logo: ''
-      }
+      },
+
+      //手动激活data
+      saveAuditVisible: false,  //手动激活界面显示
+
     }
   },
   methods: {
@@ -172,6 +197,58 @@ export default {
       this.query.currentPage = val;
       // 调用查询方法
       this.getShops();
+    },
+
+    //手动审核弹框
+    handleAudit: function(index ,row){
+      this.saveAuditVisible = true;
+      this.saveForm = Object.assign({}, row);
+    },
+
+    //驳回
+    saveReject:function(){
+      this.$confirm('确认提交吗？', '提示', {}).then(() => {
+        this.addLoading = true;
+        this.$http.get("/shop/reject/" + this.saveForm.id)
+            .then(result => {
+              result = result.data;
+              if (result.success) {
+                //从第一页开始展示
+                this.query.currentPage = 1;
+                this.getShops();
+                //关闭加载框
+                this.addLoading = false;
+                //关闭弹框
+                this.saveAuditVisible = false;
+                this.$message({message: '驳回成功', type: 'success'});
+              }
+            }).catch(result => {
+              this.$message({message: '网络错误', type: 'error'});
+        })
+      });
+    },
+
+    //审核成功
+    saveSuccessful:function(){
+      this.$confirm('确认提交吗？', '提示', {}).then(() => {
+        this.addLoading = true;
+        this.$http.get("/shop/audit/" + this.saveForm.id)
+            .then(result => {
+              result = result.data;
+              if (result.success) {
+                //从第一页开始展示
+                this.query.currentPage = 1;
+                this.getShops();
+                //关闭加载框
+                this.addLoading = false;
+                //关闭弹框
+                this.saveAuditVisible = false;
+                this.$message({message: '审核成功', type: 'success'});
+              }
+            }).catch(result => {
+              this.$message({message: '网络错误', type: 'error'});
+        })
+      });
     },
 
     //获取门店列表

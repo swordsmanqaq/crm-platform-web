@@ -10,7 +10,9 @@
     </el-form-item>
     <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
     <el-form-item style="width:100%;">
-      <el-button type="primary" style="width:100%;" @click.native.prevent="loginIn" :loading="logining">登录</el-button>
+      <el-button type="primary" style="width:48%;" @click.native.prevent="loginIn" :loading="logining">登录</el-button>
+      <el-button type="primary" style="width:48%;" @click.native.prevent="shopRegister" :loading="shopregister">店铺入住
+      </el-button>
       <!--<el-button @click.native.prevent="handleReset2">重置</el-button>-->
     </el-form-item>
   </el-form>
@@ -23,7 +25,7 @@ export default {
   data() {
     return {
       logining: false,
-
+      shopregister: false,
       loginDto: {
         username: '',
         password: ''
@@ -40,9 +42,11 @@ export default {
     };
   },
   methods: {
+
     handleReset2() {
       this.$refs.loginFrom.resetFields();
     },
+
     loginIn(ev) {
       var _this = this;
       this.$refs.loginFrom.validate((valid) => {
@@ -72,11 +76,18 @@ export default {
           return false;
         }
       });
+    },
+
+    shopRegister() {
+      //跳转首页
+      this.$router.push({path: '/shopRegister'});
     }
+
   }
 }
 
 </script>
+
 
 <style lang="scss" scoped>
 .login-container {

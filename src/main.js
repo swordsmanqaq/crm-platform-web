@@ -18,7 +18,8 @@ import routes from './routes'
 //导入axios
 import axios from "axios";
 
-axios.defaults.baseURL = '/api'  // http://localhost:8082/api
+//axios.defaults.baseURL = '/api'   //http://localhost:8082/api
+axios.defaults.baseURL = "http://localhost:8081"
 Vue.prototype.$http = axios
 
 Vue.use(ElementUI)

@@ -19,6 +19,8 @@ import NotPermission from './views/403.vue'
 import Config from "./views/sys/Config";
 import Dictionary from "./views/sys/Dictionary";
 import DictionaryItem from "./views/sys/DictionaryItem";
+import Shop from "./views/org/Shop";
+import shop from "./views/org/Shop";
 
 
 let routes = [
@@ -61,7 +63,7 @@ let routes = [
         children: [
             { path: '/department', component: Department, name: '部门管理' },
             { path: '/employee', component: Employee, name: '员工管理' },
-            { path: '/form', component: Form, name: 'Form' },
+            { path: '/shop', component: shop, name: '门店管理' },
             { path: '/user', component: user, name: '列表' },
         ]
     },

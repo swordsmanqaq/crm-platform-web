@@ -22,13 +22,28 @@
       </el-table-column>
       <el-table-column type="index" width="60">
       </el-table-column>
-      <el-table-column prop="username" label="姓名" width="110" sortable>
+      <el-table-column prop="nickName" label="姓名" width="110" sortable>
+      </el-table-column>
+      <el-table-column prop="username" label="用户名" width="110" sortable>
       </el-table-column>
       <el-table-column prop="email" label="邮箱" width="250" sortable>
       </el-table-column>
-      <el-table-column prop="headImage" label="头像" width="250" sortable>
+      <el-table-column prop="phone" label="电话" width="250" sortable>
       </el-table-column>
       <el-table-column prop="age" label="年龄" width="80" sortable>
+      </el-table-column>
+      <el-table-column prop="sex" label="性别" width="120" sortable>
+        <template slot-scope="scope">
+          <span v-if="scope.row.sex === 0" style="color: green;">FeMale</span>
+          <span v-if="scope.row.sex === 1" style="color: blue;">Male</span>
+        </template>
+      </el-table-column>
+      <el-table-column prop="state" label="状态" width="120" sortable>
+        <template slot-scope="scope">
+          <span v-if="scope.row.state === 1" style="color: green;">正常</span>
+          <span v-if="scope.row.state === 2" style="color: red;">锁定</span>
+          <span v-if="scope.row.state === 3" style="color: black;">注销</span>
+        </template>
       </el-table-column>
       <el-table-column prop="department.name" label="所属部门" width="120" sortable>
       </el-table-column>
@@ -61,6 +76,9 @@
     <el-dialog title="新增/修改" :visible.sync="saveFormVisible" :close-on-click-modal="false">
       <el-form :model="saveForm" label-width="80px" :rules="saveFormRules" ref="addForm">
         <el-form-item label="姓名">
+          <el-input v-model="saveForm.nickName" auto-complete="off"></el-input>
+        </el-form-item>
+        <el-form-item label="用户名">
           <el-input v-model="saveForm.username" auto-complete="off"></el-input>
         </el-form-item>
         <el-form-item label="密码">
@@ -68,6 +86,9 @@
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
           <el-input type="text" v-model="saveForm.email"></el-input>
+        </el-form-item>
+        <el-form-item label="电话">
+          <el-input type="text" v-model="saveForm.phone"></el-input>
         </el-form-item>
         <el-form-item label="头像">
           <el-input type="textarea" v-model="saveForm.headImage"></el-input>
@@ -94,7 +115,7 @@
       </div>
     </el-dialog>
 
-    <!-- 设置权限 编辑页面 -->
+    <!-- 设置角色页面 -->
     <el-dialog title="设置角色" :visible.sync="setRoleVisible" :close-on-click-modal="false">
       <el-form :model="EmployeeRole" label-width="80px" ref="saveForm">
         <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
@@ -151,11 +172,15 @@ export default {
       //编辑界面数据
       saveForm: {
         id: null,
-        username: '',
-        password: '',
-        email: '',
-        headImage: '',
-        age: null,
+        nickName : '',
+        username : '',
+        password : '',
+        email : '',
+        phone : '',
+        salt : '',
+        age : null,
+        sex : null,
+        state : null,
         department: {
           id: null,
           name: ""
@@ -368,11 +393,15 @@ export default {
       this.getAllDepartment();
       this.saveForm = {
         id: null,
-        username: '',
-        password: '',
-        email: '',
-        headImage: '',
-        age: null,
+        nickName : '',
+        username : '',
+        password : '',
+        email : '',
+        phone : '',
+        salt : '',
+        age : null,
+        sex : null,
+        state : null,
         department: {
           id: null,
           name: ""

@@ -17,19 +17,18 @@
         <!--        <el-button size="small" type="primary" @click="selectAdrress">选择</el-button>-->
       </el-form-item>
       <el-form-item prop="logo" label="店铺Logo">
-
-<!--        <el-upload-->
-<!--            class="upload-demo"-->
-<!--            action="http://localhost:1030/services/common/fastDfs/"-->
-<!--            :on-preview="handlePreview"-->
-<!--            :on-remove="handleRemove"-->
-<!--            :on-success="handleSuccess"-->
-<!--            :file-list="fileList"-->
-<!--            list-type="picture">-->
-<!--          <el-button size="small" type="primary">点击上传</el-button>-->
-<!--          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>-->
-<!--        </el-upload>-->
-        <el-input type="text" v-model="shop.logo" placeholder="请输入logo"></el-input>
+        <el-upload
+            class="upload-demo"
+            action="http://localhost:8081/fastDfs/upload"
+            :on-preview="handlePreview"
+            :on-remove="handleRemove"
+            :on-success="handleSuccess"
+            :file-list="fileList"
+            list-type="picture">
+          <el-button size="small" type="primary">点击上传</el-button>
+          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+        </el-upload>
+<!--        <el-input type="text" v-model="shop.logo" placeholder="请输入logo"></el-input>-->
       </el-form-item>
       <h3 class="title">管理员信息设置</h3>
       <el-form-item prop="admin.username" label="账号">
@@ -157,16 +156,17 @@ export default {
     //文件删除
     handleRemove(file, fileList) {
       var filePath = file.response.resultObj;
-      this.$http.delete("/common/fastDfs/?path=" + filePath)
+      this.$http.delete("/fastDfs/delete?path="+filePath)
           .then(res => {
             if (res.data.success) {
               this.$message({
-                message: '删除成功!',
+                message: '删除文件成功!',
                 type: 'success'
               });
+              this.shop.logo = "";  //置空，避免删除文件后logo里面仍有值会导致数据库还是可以存到url地址
             } else {
               this.$message({
-                message: '删除失败!',
+                message: '删除文件失败!',
                 type: 'error'
               });
             }

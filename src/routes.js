@@ -21,7 +21,7 @@ import Dictionary from "./views/sys/Dictionary";
 import DictionaryItem from "./views/sys/DictionaryItem";
 import shop from "./views/org/Shop";
 import ShopRegister from "./views/org/ShopRegister";
-
+import CarType from "./views/car/CarType";
 
 let routes = [
     {
@@ -59,6 +59,15 @@ let routes = [
         leaf: true,
         children: [
             { path: '/echarts', component: echarts, name: '首页' }
+        ]
+    },
+    {
+        path: '/',
+        component: Home,
+        name: '车辆管理',
+        iconCls: 'el-icon-message',//图标样式class
+        children: [
+            { path: '/carType', component: CarType, name: '车辆类型' }
         ]
     },
     {

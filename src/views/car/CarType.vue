@@ -12,7 +12,7 @@
         <el-col :span="24" class="toolbar" style="padding-bottom: 0px;text-align: center">
           <el-form :inline="true" :model="filters">
             <el-form-item>
-              <el-input v-model="filters.keyword" placeholder="关键字"></el-input>
+              <el-input v-model="filters.keyword" placeholder="keyword" style="width: 400px"></el-input>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" v-on:click="getList">查询</el-button>
@@ -66,9 +66,9 @@
         <el-form-item label="分类标题" prop="name">
           <el-input v-model="addForm.name" auto-complete="off"></el-input>
         </el-form-item>
-<!--        <el-form-item label="LOGO" prop="icon">-->
-<!--          <el-input v-model="addForm.icon" auto-complete="off"></el-input>-->
-<!--        </el-form-item>-->
+        <!--        <el-form-item label="LOGO" prop="icon">-->
+        <!--          <el-input v-model="addForm.icon" auto-complete="off"></el-input>-->
+        <!--        </el-form-item>-->
         <el-form-item prop="icon" label="车标">
           <el-upload
               class="upload-demo"
@@ -153,7 +153,7 @@ export default {
     //文件删除
     handleRemove(file, fileList) {
       var filePath = file.response.resultObj;
-      this.$http.delete("/fastDfs/delete?path="+filePath)
+      this.$http.delete("/fastDfs/delete?path=" + filePath)
           .then(res => {
             if (res.data.success) {
               this.$message({
@@ -233,7 +233,7 @@ export default {
       });
     },
 
-    handleEdit: function(index ,row){
+    handleEdit: function (index, row) {
       this.addFormVisible = true;
       this.addForm = Object.assign({}, row);
     },
@@ -281,7 +281,6 @@ export default {
       // 发送一个异步请求: get请求 /product/carType/treeData
       this.$http.get("/carType/tree")
           .then(res => {
-            console.log(this);
             this.carTypes = res.data.resultObj;
             this.datas = this.carTypes;
           });

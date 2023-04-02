@@ -119,7 +119,7 @@
           <el-input type="textarea" v-model="saveForm.address" disabled></el-input>
         </el-form-item>
         <el-form-item label="审核选择">
-          <el-radio-group v-model="ShopRejectDTO.state" @change="">
+          <el-radio-group v-model="ShopRejectDTO.state">
             <el-radio :label="2">审核通过</el-radio>
             <el-radio :label="4">审核驳回</el-radio>
           </el-radio-group>

@@ -22,6 +22,7 @@ import DictionaryItem from "./views/sys/DictionaryItem";
 import shop from "./views/org/Shop";
 import ShopRegister from "./views/org/ShopRegister";
 import CarType from "./views/car/CarType";
+import Car from "./views/car/Car";
 
 let routes = [
     {
@@ -67,7 +68,8 @@ let routes = [
         name: '车辆管理',
         iconCls: 'el-icon-message',//图标样式class
         children: [
-            { path: '/carType', component: CarType, name: '车辆类型' }
+            { path: '/carType', component: CarType, name: '车辆类型' },
+            { path: '/car', component: Car, name: '车辆' }
         ]
     },
     {

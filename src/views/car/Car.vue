@@ -12,6 +12,12 @@
         <el-form-item>
           <el-button type="primary" @click="handleAdd">新增</el-button>
         </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="onsale" plain>批量上架</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="offsale" plain>批量下架</el-button>
+        </el-form-item>
       </el-form>
     </el-col>
 
@@ -98,7 +104,15 @@
       <el-table-column label="操作" width="150" fixed="right">
         <template scope="scope">
           <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-          <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+          <el-button type="danger" size="small" v-if="scope.row.state == 0" @click="handleDel(scope.$index, scope.row)">删除</el-button>
+          <br>
+          <el-button type="danger" size="small" style="margin-top:10px;" v-if="scope.row.state == 0 && scope.row.auditstate == 1"
+                     @click="handleOnsale(scope.$index, scope.row)" round>上架
+          </el-button>
+          <el-button type="warning" size="small" style="margin-top:10px;" v-if="scope.row.state == 1"
+                     @click="handleOffsale(scope.$index, scope.row)" round>下架
+          </el-button>
+          <br>
           <el-button type="primary" size="small" style="margin-top:10px;"
                      @click="handleResource(scope.$index, scope.row)">资源维护
           </el-button>
@@ -108,7 +122,9 @@
             上传检测报告
           </el-button>
           <br>
-          <el-button type="info" size="small" style="margin-top:10px;" @click="handleAudit(scope.$index, scope.row)">手动审核</el-button>
+          <el-button type="info" size="small" style="margin-top:10px;" @click="handleAudit(scope.$index, scope.row)">
+            手动审核
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -444,14 +460,81 @@ export default {
 
       //手动审核data
       saveAuditVisible: false,  //手动激活界面显示
-      carAudit:{
-        id:null,
-        auditstate:null
+      carAudit: {
+        id: null,
+        auditstate: null
       }
 
     }
   },
   methods: {
+
+    //批量上架
+    onsale() {
+      var ids = this.sels.map(item => item.id);
+      //获取选中的行
+      if (!this.sels || this.sels.length < 1) {
+        this.$message({message: '老铁，你不选中数据，臣妾上架不了啊....', type: 'error'});
+        return;
+      }
+      this.$confirm('确认上架选中记录吗？', '提示', {
+        type: 'warning'
+      }).then(() => {
+        this.listLoading = true;
+        this.$http.post('/car/onsale', ids).then((res) => {
+          this.listLoading = false;
+          res = res.data;
+          if (res.success) {
+            this.$message({
+              message: res.message,
+              type: 'success'
+            });
+          } else {
+            this.$message({
+              message: res.message,
+              type: 'error'
+            });
+          }
+          this.getCars();
+        });
+      }).catch(() => {
+
+      });
+    },
+
+    //批量下架
+    offsale() {
+      var ids = this.sels.map(item => item.id);
+      //获取选中的行
+      if (!this.sels || this.sels.length < 1) {
+        this.$message({message: '老铁，你不选中数据，臣妾下架不了啊....', type: 'error'});
+        return;
+      }
+      this.$confirm('确认下架选中记录吗？', '提示', {
+        type: 'warning'
+      }).then(() => {
+        this.listLoading = true;
+        this.$http.post('/car/offsale', ids).then((res) => {
+          this.listLoading = false;
+          res = res.data
+          if (res.success) {
+            this.$message({
+              message: res.message,
+              type: 'success'
+            });
+          } else {
+            this.$message({
+              message: res.message,
+              type: 'error'
+            });
+          }
+          this.getCars();
+        });
+      }).catch(() => {
+
+      });
+    },
+
 
     //封面图删除
     coverHandleRemove(file, fileList) {
@@ -654,7 +737,6 @@ export default {
     },
 
 
-
     //上传检测报告按钮函数
     handleReport: function (index, row) {
       //置空，防止数据留到下一次
@@ -670,7 +752,7 @@ export default {
     },
 
     //根据carId获取carReport做数据回显
-    getCarReportByCarId(carId){
+    getCarReportByCarId(carId) {
       this.$http.get("/carDetail/carId/" + carId)
           .then(result => {
             result = result.data;
@@ -788,7 +870,7 @@ export default {
     },
 
     //上传检测报告提交
-    saveCarReport: function (){
+    saveCarReport: function () {
       this.$confirm('确认提交吗？', '提示', {}).then(() => {
         this.carFormLoading = true;
         this.$http.put("/carDetail", this.carReport)
@@ -808,7 +890,7 @@ export default {
 
 
     //手动审核弹框
-    handleAudit: function (index, row){
+    handleAudit: function (index, row) {
       this.saveAuditVisible = true;
       this.carForm.title = row.title;
       this.carAudit.id = row.id;
@@ -816,7 +898,7 @@ export default {
     },
 
     //手动审核提交
-    saveAuditCommit(){
+    saveAuditCommit() {
       this.$confirm('确认提交吗？', '提示', {}).then(() => {
         this.carFormLoading = true;
         this.$http.put("/car/audit", this.carAudit)
@@ -836,25 +918,6 @@ export default {
       });
     },
 
-
-    //根据car的id获取cover做回显
-    getCarCoverById(id){
-      this.$http.get("/car/" + id)
-          .then(result => {
-            result = result.data;
-            if (result.success) {
-              this.carForm.cover = result.resultObj.cover;
-              // {carId:null,img:"",viceimg:"",moreimg:""}
-              if (result.resultObj) {
-                if (result.resultObj.cover) {
-                  var imgurl = result.resultObj.cover
-                  this.coverFileList.push({name: name, url: imgurl, response: {resultObj: imgurl}})
-                  this.carForm.cover = result.resultObj.cover;
-                }
-              }
-            }
-          })
-    },
 
     selsChange: function (sels) {
       this.sels = sels;
@@ -968,16 +1031,8 @@ export default {
       this.carForm.rushsale = row.rushsale;
       this.carForm.quasinewcar = row.quasinewcar;
       this.carForm.transitivecountry = row.transitivecountry;
-      if (!row.type){
-        this.carForm.type = {
-          id: null,
-          name: ""
-        }
-      }
 
       this.getCarTypeTree();
-
-
     },
 
     //显示新增界面

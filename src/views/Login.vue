@@ -28,7 +28,8 @@ export default {
       shopregister: false,
       loginDto: {
         username: '',
-        password: ''
+        password: '',
+        type: 0
       },
       rules2: {
         username: [
@@ -53,7 +54,7 @@ export default {
         if (valid) {
           //_this.$router.replace('/table');
           this.logining = true;
-          this.$http.post("/login", this.loginDto)
+          this.$http.post("/login/account", this.loginDto)
               .then(result => {
                 result = result.data;
                 this.logining = false;

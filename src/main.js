@@ -32,19 +32,20 @@ const router = new VueRouter({
     routes
 })
 
-// router.beforeEach((to, from, next) => {
-//     //NProgress.start();
-//     if (to.path == '/login') {
-//         localStorage.removeItem('token');
-//     }
-//     let user = JSON.parse(localStorage.getItem('loginUser'));
-//     if (!user && to.path != '/login') {
-//         alert("请登录后再次访问!")
-//         next({path: '/login'})
-//     } else {
-//         next()
-//     }
-// })
+//登录前置拦截
+router.beforeEach((to, from, next) => {
+    //NProgress.start();
+    if (to.path == '/login') {
+        localStorage.removeItem('token');
+    }
+    let user = JSON.parse(localStorage.getItem('loginUser'));
+    if (!user && to.path != '/login') {
+        alert("请登录后再次访问!")
+        next({path: '/login'})
+    } else {
+        next()
+    }
+})
 
 //router.afterEach(transition => {
 //NProgress.done();

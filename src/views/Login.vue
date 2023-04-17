@@ -11,14 +11,12 @@
     <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
     <el-form-item style="width:100%;">
       <el-button type="primary" style="width:100%;" @click.native.prevent="loginIn" :loading="logining">登录</el-button>
-      <!--<el-button @click.native.prevent="handleReset2">重置</el-button>-->
     </el-form-item>
   </el-form>
 </template>
 
 <script>
 
-//import NProgress from 'nprogress'
 export default {
   data() {
     return {
@@ -80,7 +78,6 @@ export default {
 
 <style lang="scss" scoped>
 .login-container {
-  /*box-shadow: 0 0px 8px 0 rgba(0, 0, 0, 0.06), 0 1px 0px 0 rgba(0, 0, 0, 0.02);*/
   -webkit-border-radius: 5px;
   border-radius: 5px;
   -moz-border-radius: 5px;

@@ -11,7 +11,8 @@
       </el-col>
       <el-col :span="4" class="userinfo">
         <el-dropdown trigger="hover">
-          <span class="el-dropdown-link userinfo-inner"><img :src="this.sysUserAvatar"/> {{ sysUserName }}</span>
+          <span class="el-dropdown-link userinfo-inner"><img
+              src="https://pic2.zhimg.com/v2-9523356417137af605b62b7d8c865d51_r.jpg?source=1940ef5c"/> {{ sysUserName }}</span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item>我的消息</el-dropdown-item>
             <el-dropdown-item>设置</el-dropdown-item>
@@ -22,28 +23,6 @@
     </el-col>
     <el-col :span="24" class="main">
       <aside :class="collapsed?'menu-collapsed':'menu-expanded'">
-        <!--导航菜单-->
-<!--        <el-menu :default-active="$route.path"-->
-<!--                 class="el-menu-vertical-demo"-->
-<!--                 @open="handleopen"-->
-<!--                 @close="handleclose"-->
-<!--                 @select="handleselect"-->
-<!--                 unique-opened router v-show="!collapsed">-->
-<!--          <el-menu-item index="/echarts" key="/echarts">-->
-<!--            <i class="fa fa-bar-chart"></i>-->
-<!--                首页-->
-<!--          </el-menu-item>-->
-<!--          <template v-for="(item,index) in menuTree">-->
-<!--            <el-submenu :index="index+''">-->
-<!--              <template slot="title"><i :class="item.icon"></i>{{ item.name }}</template>-->
-<!--              <el-menu-item v-for="child in item.children"-->
-<!--                            :index="child.url" :key="child.url" :class="child.icon">-->
-<!--                {{ child.name }}-->
-<!--              </el-menu-item>-->
-<!--            </el-submenu>-->
-<!--          </template>-->
-<!--        </el-menu>-->
-
 
         <el-menu :default-active="$route.path" class="el-menu-vertical-demo" @open="handleopen" @close="handleclose"
                  @select="handleselect"
@@ -61,30 +40,6 @@
           </template>
         </el-menu>
 
-<!--                  &lt;!&ndash;导航菜单-折叠后&ndash;&gt;-->
-<!--                  <ul class="el-menu el-menu-vertical-demo collapsed" v-show="collapsed" ref="menuCollapsed">-->
-<!--                    <li v-for="(item,index) in $router.options.routes" v-if="!item.hidden" class="el-submenu item">-->
-<!--                      <template v-if="!item.leaf">-->
-<!--                        <div class="el-submenu__title" style="padding-left: 20px;" @mouseover="showMenu(index,true)"-->
-<!--                             @mouseout="showMenu(index,false)"><i :class="item.iconCls"></i></div>-->
-<!--                        <ul class="el-menu submenu" :class="'submenu-hook-'+index" @mouseover="showMenu(index,true)"-->
-<!--                            @mouseout="showMenu(index,false)">-->
-<!--                          <li v-for="child in item.children" v-if="!child.hidden" :key="child.path" class="el-menu-item"-->
-<!--                              style="padding-left: 40px;" :class="$route.path==child.path?'is-active':''"-->
-<!--                              @click="$router.push(child.path)">{{ child.name }}-->
-<!--                          </li>-->
-<!--                        </ul>-->
-<!--                      </template>-->
-<!--                      <template v-else>-->
-<!--                    <li class="el-submenu">-->
-<!--                      <div class="el-submenu__title el-menu-item"-->
-<!--                           style="padding-left: 20px;height: 56px;line-height: 56px;padding: 0 20px;"-->
-<!--                           :class="$route.path==item.children[0].path?'is-active':''"-->
-<!--                           @click="$router.push(item.children[0].path)"><i :class="item.iconCls"></i></div>-->
-<!--                    </li>-->
-<!--          </template>-->
-<!--          </li>-->
-<!--          </ul>-->
       </aside>
       <section class="content-container">
         <div class="grid-content bg-purple-light">
@@ -112,7 +67,7 @@
 export default {
   data() {
     return {
-      sysName: '权限基础平台',
+      sysName: '小区住户管理系统平台',
       collapsed: false,
       sysUserName: '',
       sysUserAvatar: '',
@@ -177,15 +132,15 @@ export default {
       this.$refs.menuCollapsed.getElementsByClassName('submenu-hook-' + i)[0].style.display = status ? 'block' : 'none';
     },
 
-    getTree(loginUser){
+    getTree(loginUser) {
       this.$http.get("/menu/tree/" + loginUser)
-          .then( result => {
+          .then(result => {
             result = result.data;
-            if (result.success){
+            if (result.success) {
               this.menuTree = result.resultObj;
             }
-          }).catch( result => {
-            this.$message({type: "error", message: "网络错误"});
+          }).catch(result => {
+        this.$message({type: "error", message: "网络错误"});
       })
     }
 
@@ -203,7 +158,6 @@ export default {
 
   }
 }
-
 
 
 </script>

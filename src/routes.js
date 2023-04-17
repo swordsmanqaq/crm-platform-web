@@ -10,6 +10,7 @@ import Household from "./views/org/Household";
 import Permission from "./views/auth/Permission";
 import Role from "./views/auth/Role";
 import Menus from "./views/auth/Menus";
+import PersonEntryAndExitRecords from "./views/org/PersonEntryAndExitRecords";
 import NotPermission from './views/403.vue'
 
 let routes = [
@@ -50,9 +51,8 @@ let routes = [
         name: '组织机构管理',
         iconCls: 'el-icon-message',//图标样式class
         children: [
-            { path: '/household', component: Household, name: '住户管理' },
-            { path: '/form', component: Form, name: 'Form' },
-            { path: '/user', component: user, name: '列表' },
+            { path: '/household', component: Household, name: '住户人员管理' },
+            { path: '/personEntryAndExitRecords', component: PersonEntryAndExitRecords, name: '进出入人员记录' }
         ]
     },
     {
@@ -71,7 +71,7 @@ let routes = [
         component: Home,
         name: '',
         iconCls: 'fa fa-address-card',
-        leaf: true,//只有一个节点
+        leaf: true,
         children: [
 
         ]

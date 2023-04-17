@@ -9,11 +9,6 @@ import VueRouter from 'vue-router'
 import store from './vuex/store'
 import Vuex from 'vuex'
 import routes from './routes'
-//import NProgress from 'nprogress'
-
-//import 'nprogress/nprogress.css'
-// import Mock from './mock'
-// Mock.bootstrap();
 
 //导入axios
 import axios from "axios";
@@ -31,23 +26,19 @@ const router = new VueRouter({
     routes
 })
 
-// router.beforeEach((to, from, next) => {
-//     //NProgress.start();
-//     if (to.path == '/login') {
-//         localStorage.removeItem('token');
-//     }
-//     let user = JSON.parse(localStorage.getItem('loginUser'));
-//     if (!user && to.path != '/login') {
-//         alert("请登录后再次访问!")
-//         next({path: '/login'})
-//     } else {
-//         next()
-//     }
-// })
-
-//router.afterEach(transition => {
-//NProgress.done();
-//});
+router.beforeEach((to, from, next) => {
+    //NProgress.start();
+    if (to.path == '/login') {
+        localStorage.removeItem('token');
+    }
+    let user = JSON.parse(localStorage.getItem('loginUser'));
+    if (!user && to.path != '/login') {
+        alert("请登录后再次访问!")
+        next({path: '/login'})
+    } else {
+        next()
+    }
+})
 
 //axios请求拦截器:添加请求拦截器，在请求头中加token
 //前端调用后端接口,是过axios发起请求的,在axios调用后端接口之前,都会先经过axios的前置拦截器
@@ -65,6 +56,7 @@ axios.interceptors.request.use(
     error => {
         return Promise.reject(error)
     })
+
 // 响应拦截器:后端响应结果给前端时,都要先经过响应拦截器
 axios.interceptors.response.use(function (response) {
     //对返回的数据进行操作
@@ -73,7 +65,7 @@ axios.interceptors.response.use(function (response) {
         router.push({path: '/login'});  // 跳转回登陆页面
         return ElementUI.Message.error("请登录后访问");
         // return response;
-    } else if (!result.success && result.message == "NoPermission"){
+    } else if (!result.success && result.message == "NoPermission") {
         router.push({path: '/403'});  // 跳转403页面
 
     } else {
@@ -86,8 +78,6 @@ axios.interceptors.response.use(function (response) {
 
 
 new Vue({
-    //el: '#app',
-    //template: '<App/>',
     router,
     store,
     //components: { App }

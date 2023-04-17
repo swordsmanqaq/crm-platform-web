@@ -22,15 +22,17 @@
       </el-table-column>
       <el-table-column type="index" width="100">
       </el-table-column>
-      <el-table-column prop="username" label="姓名" width="150" sortable>
+      <el-table-column prop="username" label="姓名" width="120" sortable>
       </el-table-column>
-      <el-table-column prop="age" label="年龄" width="110" sortable>
+      <el-table-column prop="age" label="年龄" width="100" sortable>
       </el-table-column>
-      <el-table-column prop="checkTime" label="入住时间" width="240" sortable>
+      <el-table-column prop="checkTime" label="入住时间" width="220" sortable>
       </el-table-column>
-      <el-table-column prop="leaveTime" label="离开时间" width="240" sortable>
+      <el-table-column prop="leaveTime" label="离开时间" width="220" sortable>
       </el-table-column>
-      <el-table-column label="操作" width="28 0">
+      <el-table-column prop="build" label="住处" width="120" sortable>
+      </el-table-column>
+      <el-table-column label="操作" width="280">
         <template scope="scope">
           <el-button size="small" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
           <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">Delete</el-button>
@@ -92,6 +94,9 @@
               </el-date-picker>
             </div>
           </template>
+        </el-form-item>
+        <el-form-item label="住处">
+          <el-input type="text" v-model="saveForm.build"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -161,7 +166,8 @@ export default {
         password: '',
         age: null,
         checkTime: '',
-        leaveTime: ''
+        leaveTime: '',
+        build: ''
       },
 
       //设置角色相关data
@@ -382,7 +388,8 @@ export default {
         password: '',
         age: null,
         checkTime: '',
-        leaveTime: ''
+        leaveTime: '',
+        build: ''
       };
     },
 

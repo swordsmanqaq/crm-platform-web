@@ -105,9 +105,6 @@
 </template>
 
 <script>
-	// import util from '../../common/js/util'
-	//import NProgress from 'nprogress'
-	// import { getUserListPage, removeUser, batchRemoveUser, editUser, addUser } from '../../api/api';
 
 	export default {
 		data() {

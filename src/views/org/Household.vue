@@ -26,17 +26,18 @@
       </el-table-column>
       <el-table-column prop="age" label="年龄" width="100" sortable>
       </el-table-column>
-      <el-table-column prop="checkTime" label="入住时间" width="220" sortable>
+      <el-table-column prop="checkTime" label="入住时间" width="200" sortable>
       </el-table-column>
-      <el-table-column prop="leaveTime" label="离开时间" width="220" sortable>
+      <el-table-column prop="leaveTime" label="离开时间" width="200" sortable>
       </el-table-column>
-      <el-table-column prop="build" label="住处" width="120" sortable>
+      <el-table-column prop="build" label="住处" width="90" sortable>
       </el-table-column>
-      <el-table-column label="操作" width="280">
+      <el-table-column label="操作" width="350">
         <template scope="scope">
           <el-button size="small" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
           <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">Delete</el-button>
           <el-button type="success" size="small" @click="handleRole(scope.$index, scope.row)">Set-Role</el-button>
+          <el-button type="warning" size="small" @click="handleICLoss(scope.$index, scope.row)">IC-Loss</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -55,7 +56,7 @@
       </el-pagination>
     </el-col>
 
-    <!--编辑界面-->
+    <!--编辑界面 -->
     <el-dialog title="新增/修改" :visible.sync="saveFormVisible" :close-on-click-modal="false">
       <el-form :model="saveForm" label-width="80px" :rules="saveFormRules" ref="addForm">
         <el-form-item label="姓名" prop="username">
@@ -105,7 +106,7 @@
       </div>
     </el-dialog>
 
-    <!-- 设置权限 编辑页面 -->
+    <!-- 设置角色 编辑页面 -->
     <el-dialog title="设置角色" :visible.sync="setRoleVisible" :close-on-click-modal="false">
       <el-form :model="EmployeeRole" label-width="80px" ref="saveForm">
         <el-checkbox :indeterminate="isIndeterminate" v-model="checkAll" @change="handleCheckAllChange">全选</el-checkbox>
@@ -123,6 +124,22 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="setRoleVisible = false">Cancel</el-button>
         <el-button type="primary" @click.native="saveEmployeeRole" :loading="addLoading">Submit</el-button>
+      </div>
+    </el-dialog>
+
+    <!-- 挂失界面 -->
+    <el-dialog title="门禁卡挂失" :visible.sync="saveICVisible" :close-on-click-modal="false">
+      <el-form label-width="80px" ref="addForm">
+        <el-form-item label="姓名" prop="username">
+          <el-input type="text" v-model="saveForm.username" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="住处" prop="password">
+          <el-input type="text" v-model="saveForm.build" disabled></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click.native="saveICVisible = false">Cancel</el-button>
+        <el-button type="primary" @click.native="saveICSubmit" :loading="addLoading">Submit</el-button>
       </div>
     </el-dialog>
 
@@ -178,12 +195,44 @@ export default {
       },
       isIndeterminate: false,   //多选的状态
       checkAll: false,
-      Roles: [],       //用来显示数据
-      allRoleIds: []     //用来装所有角色的id
+      Roles: [],          //用来显示数据
+      allRoleIds: [],     //用来装所有角色的id
+
+      //IC卡挂失data
+      saveICVisible: false,
+
 
     }
   },
   methods: {
+
+    //卡片挂失提交
+    saveICSubmit(){
+      this.$confirm('确认提交卡片挂失选择吗?', '提示', {
+        type: 'warning'
+      }).then(() => {
+        this.$http.post("/iccard/loss/" + this.saveForm.id)
+            .then(result => {
+              result = result.data;
+              if (result.success) {
+                this.saveICVisible = false;
+                this.$message({message: result.message, type: 'success'});
+              } else {
+                this.$message({message: result.message, type: 'error'});
+              }
+            }).catch(result => {
+              this.$message({message: '网络错误', type: 'error'});
+        })
+      })
+    },
+
+    //卡片挂饰按钮
+    handleICLoss(index,row){
+      this.saveICVisible = true;
+      this.saveForm.username = row.username;
+      this.saveForm.build = row.build;
+      this.saveForm.id = row.id;
+    },
 
     //全选按钮
     handleCheckAllChange(val) {

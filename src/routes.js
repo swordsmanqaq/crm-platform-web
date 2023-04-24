@@ -11,6 +11,7 @@ import Permission from "./views/auth/Permission";
 import Role from "./views/auth/Role";
 import Menus from "./views/auth/Menus";
 import PersonEntryAndExitRecords from "./views/org/PersonEntryAndExitRecords";
+import ICCard from "./views/org/ICCard";
 import NotPermission from './views/403.vue'
 
 let routes = [
@@ -52,7 +53,8 @@ let routes = [
         iconCls: 'el-icon-message',//图标样式class
         children: [
             { path: '/household', component: Household, name: '住户人员管理' },
-            { path: '/personEntryAndExitRecords', component: PersonEntryAndExitRecords, name: '进出入人员记录' }
+            { path: '/personEntryAndExitRecords', component: PersonEntryAndExitRecords, name: '进出入人员记录' },
+            { path: '/iccard', component: ICCard, name: 'IC卡管理' }
         ]
     },
     {

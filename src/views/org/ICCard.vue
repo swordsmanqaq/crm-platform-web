@@ -28,17 +28,18 @@
       </el-table-column>
       <el-table-column prop="type" label="卡片类型" width="200" sortable>
       </el-table-column>
-      <el-table-column prop="state" label="卡片状态" width="240" sortable>
+      <el-table-column prop="state" label="卡片状态" width="160" sortable>
         <template slot-scope="scope">
           <span v-if="scope.row.state == 0">未分配</span>
           <span v-if="scope.row.state == 1">正常</span>
           <span v-if="scope.row.state == -1">挂失</span>
         </template>
       </el-table-column>
-      <el-table-column label="操作" width="200">
+      <el-table-column label="操作" width="300">
         <template scope="scope">
           <el-button size="small" @click="handleEdit(scope.$index, scope.row)">Edit</el-button>
           <el-button type="danger" size="small" @click="handleDel(scope.$index, scope.row)">Delete</el-button>
+          <el-button type="primary" size="small" @click="handleAllocation(scope.$index, scope.row)" v-if="scope.row.state == 0">Allocation</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -76,6 +77,26 @@
       <div slot="footer" class="dialog-footer">
         <el-button @click.native="saveFormVisible = false">Cancel</el-button>
         <el-button type="primary" @click.native="saveSubmit" :loading="addLoading">Submit</el-button>
+      </div>
+    </el-dialog>
+
+    <!--IC卡分配界面-->
+    <el-dialog title="IC卡分配" :visible.sync="saveICVisible" :close-on-click-modal="false">
+      <el-form :model="saveForm" label-width="80px" ref="addForm">
+        <el-form-item label="分配住户">
+          <el-select v-model="allocationForm.household" clearable value-key="id" placeholder="请选择住户：">
+            <el-option
+                v-for="item in households"
+                :key="item.id"
+                :label="item.username"
+                :value="item">
+            </el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click.native="saveICVisible = false">Cancel</el-button>
+        <el-button type="primary" @click.native="allocationIC" :loading="addLoading">Submit</el-button>
       </div>
     </el-dialog>
 
@@ -117,7 +138,19 @@ export default {
         userId: '',
         type: '',
         state: ''
-      }
+      },
+
+      //分配IC卡data
+      saveICVisible: false,
+      allocationForm:{
+        id: null,
+        household:{
+          id: null,
+          username: ''
+        }
+      },
+
+      households:[]
 
     }
   },
@@ -148,7 +181,7 @@ export default {
       this.sels = sels;
     },
 
-    //获取进出入人员记录
+    //获取IC记录
     getICCard() {
       this.$http.post("/iccard/page", this.query)
           .then(result => {
@@ -162,6 +195,86 @@ export default {
           .catch(result => {
 
           })
+    },
+
+    //分配IC卡
+    handleAllocation(index,row){
+      this.saveICVisible = true;
+      this.allocationForm.id = row.id;
+      this.getHouseholdAll();
+
+    },
+
+    //IC卡分配提交
+    allocationIC: function () {
+      this.$refs.addForm.validate((valid) => {
+        if (valid) {
+          this.$confirm('确认提交吗？', '提示', {}).then(() => {
+            this.addLoading = true;
+            console.log(this.allocationForm)
+            this.$http.post("/iccard/allocation", this.allocationForm)
+                .then(result => {
+                  result = result.data;
+                  if (result.success) {
+                    //从第一页开始展示
+                    this.query.currentPage = 1;
+                    this.getICCard();
+                    //关闭加载框
+                    this.addLoading = false;
+                    //关闭弹框
+                    this.saveICVisible = false;
+                    this.$message({message: '保存成功', type: 'success'});
+                  }
+                }).catch(result => {
+              this.$message({message: '网络错误', type: 'error'});
+            })
+          });
+        }
+      });
+    },
+
+    //获取所有的住户信息
+    getHouseholdAll() {
+      this.$http.get("/household")
+          .then(result => {
+            result = result.data;
+            if (result.success) {
+              this.households = result.resultObj;
+            } else {
+              this.$message({message: result.message, type: 'error'});
+            }
+          })
+          .catch(result => {
+
+          })
+    },
+
+    //删除IC卡
+    handleDel: function (index, row) {
+      this.$confirm('确认删除该记录吗?', '提示', {
+        type: 'warning'
+      }).then(() => {
+        this.listLoading = true;
+        this.$http.delete("/iccard/" + row.id)
+            .then(result => {
+              result = result.data;
+              this.listLoading = false;
+              if (result.success) {
+                this.$message({message: '删除成功', type: 'success'});
+                //删除成功后回到第一页
+                this.query.currentPage = 1;
+                // 删除成功,要重新刷新该页面，调用方法查询
+                this.getICCard();
+              } else {
+                this.$message({message: result.message, type: 'error'});
+              }
+            })
+            .catch(result => {
+              this.$message({message: '很抱歉，网络有误', type: 'error'});
+            })
+      }).catch(() => {
+        this.$message({message: '已取消删除', type: 'info'});
+      });
     },
 
     //批量删除信息
